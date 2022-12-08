@@ -1,0 +1,37 @@
+body {
+  background: #555;
+}
+
+.card {
+  max-width: 400px;
+  margin: 2em auto;
+  text-align: center;
+  padding: 2em;
+  padding-bottom: 4em;
+}
+
+.card img {
+  max-width: 150px;
+}
+
+
+.card div {
+  cursor: pointer;
+  margin-top: 2em;
+  color: #007bff;
+}
+
+table {
+  max-width: 600px;
+  text-align: center;
+  margin: 2em auto;
+  background: #fff;
+}
+
+thead tr {
+  background: #f2f2f2;
+}
+
+th {
+  width: 33.333%
+}
