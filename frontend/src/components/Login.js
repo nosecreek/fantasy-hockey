@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
 import axios from 'axios'
+import { TrophyFill } from 'react-bootstrap-icons'
 
 const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
   const [teams, setTeams] = useState(null)
@@ -34,7 +35,7 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
     return (
       <div class="login">
         <Button variant="primary" onClick={onClickLogin} className="btn-lg">
-          Log in to Yahoo!
+          <TrophyFill /> Log in to Yahoo!
         </Button>
       </div>
     )
