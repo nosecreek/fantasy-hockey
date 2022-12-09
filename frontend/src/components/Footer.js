@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <div class="footer">
+    <div className="footer">
       <a href="/auth/logout">Logout</a>
     </div>
   )

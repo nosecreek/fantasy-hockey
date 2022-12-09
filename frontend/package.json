@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.2.1",
     "colorjs.io": "^0.4.2",
+    "http-proxy-middleware": "^2.0.6",
     "react": "^18.2.0",
     "react-bootstrap": "^2.7.0",
     "react-bootstrap-icons": "^1.10.2",
@@ -39,5 +40,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3003"
+  "proxy": "https://localhost:3003"
 }

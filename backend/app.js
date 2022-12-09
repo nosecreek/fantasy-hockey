@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 require('dotenv').config()
 
 const fs = require('fs')
-const { serialize } = require('v8')
+const { serialize } = require('cookie')
 const key = fs.readFileSync('./key.pem')
 const cert = fs.readFileSync('./cert.pem')
 const server = https.createServer({ key: key, cert: cert }, app)
@@ -64,7 +64,7 @@ app.get('/auth/logout', (req, res) => {
     })
   ])
 
-  return res.json({ success: true })
+  return res.redirect('http://localhost:3000/')
 })
 
 app.get('/api/team', async (req, res) => {

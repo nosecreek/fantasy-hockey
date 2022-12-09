@@ -18,7 +18,7 @@ const App = () => {
   useEffect(() => {
     const loadLeagueInfo = async () => {
       try {
-        const result = await axios.post('https://localhost:3003/api/league', {
+        const result = await axios.post('/api/league', {
           leagueKey: leagueKey
         })
         setLeague(result.data)
@@ -36,7 +36,7 @@ const App = () => {
   useEffect(() => {
     const loadMatchup = async () => {
       try {
-        const result = await axios.post('https://localhost:3003/api/matchup', {
+        const result = await axios.post('/api/matchup', {
           teamKey: teamKey
         })
         setMatchup(result.data)
@@ -53,23 +53,17 @@ const App = () => {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const result = await axios.post(
-          'https://localhost:3003/api/teamstats',
-          {
-            teamKey: teamKey
-          }
-        )
+        const result = await axios.post('/api/teamstats', {
+          teamKey: teamKey
+        })
         setTeamStats(result.data)
       } catch (e) {
         console.log(e)
       }
       try {
-        const result = await axios.post(
-          'https://localhost:3003/api/teamstats',
-          {
-            teamKey: matchup.matchups[week - 1].teams[1].team_key
-          }
-        )
+        const result = await axios.post('/api/teamstats', {
+          teamKey: matchup.matchups[week - 1].teams[1].team_key
+        })
         setOppStats(result.data)
       } catch (e) {
         console.log(e)

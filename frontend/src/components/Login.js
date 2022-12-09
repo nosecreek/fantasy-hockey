@@ -8,7 +8,7 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
   const [teams, setTeams] = useState(null)
 
   const onClickLogin = () => {
-    window.location.replace('https://localhost:3003/auth/yahoo')
+    window.location.replace('/auth/yahoo')
   }
 
   const setTeam = (team) => {
@@ -19,7 +19,7 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
   useEffect(() => {
     const testAuth = async () => {
       try {
-        const result = await axios.get('https://localhost:3003/api/team')
+        const result = await axios.get('/api/team')
         setTeams(result.data)
         setAuth(true)
       } catch (e) {
