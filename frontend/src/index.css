@@ -94,3 +94,14 @@ h2 {
   align-items: center;
   justify-content: center;
 }
+
+.footer {
+  width: 100%;
+  text-align: center;
+  color: #f2f2f2;
+  margin: 1em 0;
+}
+
+.footer a {
+  color: #f2f2f2;
+}

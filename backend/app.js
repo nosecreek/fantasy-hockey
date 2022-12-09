@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 require('dotenv').config()
 
 const fs = require('fs')
+const { serialize } = require('v8')
 const key = fs.readFileSync('./key.pem')
 const cert = fs.readFileSync('./cert.pem')
 const server = https.createServer({ key: key, cert: cert }, app)
@@ -47,6 +48,23 @@ app.get('/auth/yahoo/callback', (req, res) => {
   } catch (e) {
     console.log(e.description)
   }
+})
+
+app.get('/auth/logout', (req, res) => {
+  res.setHeader('Set-Cookie', [
+    serialize('accessToken', '', {
+      path: '/',
+      httpOnly: true,
+      expires: new Date()
+    }),
+    serialize('refreshToken', '', {
+      path: '/',
+      httpOnly: true,
+      expires: new Date()
+    })
+  ])
+
+  return res.json({ success: true })
 })
 
 app.get('/api/team', async (req, res) => {

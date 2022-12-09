@@ -3,6 +3,7 @@ import axios from 'axios'
 import Matchup from './components/Matchup'
 import Login from './components/Login'
 import Loading from './components/Loading'
+import Footer from './components/Footer'
 
 const App = () => {
   const [auth, setAuth] = useState(null)
@@ -104,6 +105,7 @@ const App = () => {
           setWeek={setWeek}
           matchup={matchup}
         />
+        <Footer />
       </div>
     )
   } catch {
