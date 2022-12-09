@@ -5,8 +5,9 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "NODE_ENV=production node app.js",
+    "dev": "NODE_ENV=development nodemon app.js",
+    "build:ui": "rm -rf build && cd ../frontend && npm run build && cp -r build ../backend"
   },
   "author": "Dustin Lammiman",
   "license": "ISC",
