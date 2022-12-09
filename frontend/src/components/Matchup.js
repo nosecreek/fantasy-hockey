@@ -2,7 +2,7 @@ import Table from 'react-bootstrap/Table'
 import Color from 'colorjs.io'
 import { ArrowLeftCircle, ArrowRightCircle } from 'react-bootstrap-icons'
 
-const Matchup = ({ teamStats, oppStats, league, week, setWeek }) => {
+const Matchup = ({ teamStats, oppStats, league, week, setWeek, matchup }) => {
   const c1 = new Color('red')
   const c2 = new Color('p3', [0, 1, 0])
   const range = c1.range(c2, { space: 'hsl' })
@@ -25,7 +25,7 @@ const Matchup = ({ teamStats, oppStats, league, week, setWeek }) => {
   }
 
   const changeWeek = (x) => {
-    if (week + x > 0) {
+    if (week + x > 0 && week + x < matchup.matchups.length + 1) {
       setWeek(week + x)
     }
   }
@@ -45,9 +45,15 @@ const Matchup = ({ teamStats, oppStats, league, week, setWeek }) => {
   return (
     <div className="matchup">
       <div className="header">
-        <ArrowLeftCircle onClick={() => changeWeek(-1)} />
+        <ArrowLeftCircle
+          onClick={() => changeWeek(-1)}
+          className={week === 1 ? 'disabled' : undefined}
+        />
         <h2>Week {week}</h2>
-        <ArrowRightCircle onClick={() => changeWeek(1)} />
+        <ArrowRightCircle
+          onClick={() => changeWeek(1)}
+          className={week === matchup.matchups.length ? 'disabled' : undefined}
+        />
       </div>
 
       <Table bordered hover>

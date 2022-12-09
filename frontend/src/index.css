@@ -60,6 +60,11 @@ h2 {
   cursor: pointer;
 }
 
+.header svg.disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .loading {
   position: fixed;
   top: 0;

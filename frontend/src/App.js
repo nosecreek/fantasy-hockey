@@ -21,7 +21,7 @@ const App = () => {
           leagueKey: leagueKey
         })
         setLeague(result.data)
-        setWeek(result.data.current_week)
+        setWeek(parseInt(result.data.current_week))
       } catch (e) {
         console.log(e)
       }
@@ -36,8 +36,7 @@ const App = () => {
     const loadMatchup = async () => {
       try {
         const result = await axios.post('https://localhost:3003/api/matchup', {
-          teamKey: teamKey,
-          week: week
+          teamKey: teamKey
         })
         setMatchup(result.data)
       } catch (e) {
@@ -45,10 +44,10 @@ const App = () => {
       }
     }
 
-    if (teamKey && week) {
+    if (teamKey) {
       loadMatchup()
     }
-  }, [teamKey, week])
+  }, [teamKey])
 
   useEffect(() => {
     const loadStats = async () => {
@@ -67,7 +66,7 @@ const App = () => {
         const result = await axios.post(
           'https://localhost:3003/api/teamstats',
           {
-            teamKey: matchup.matchups[0].teams[1].team_key
+            teamKey: matchup.matchups[week - 1].teams[1].team_key
           }
         )
         setOppStats(result.data)
@@ -79,7 +78,7 @@ const App = () => {
     if (matchup && teamKey) {
       loadStats()
     }
-  }, [matchup, teamKey])
+  }, [matchup, week, teamKey])
 
   if (!teamKey)
     return (
@@ -95,8 +94,7 @@ const App = () => {
     return (
       <div>
         {!(
-          parseInt(matchup.matchups[0].week) === parseInt(week) &&
-          oppStats.team_key === matchup.matchups[0].teams[1].team_key
+          oppStats.team_key === matchup.matchups[week - 1].teams[1].team_key
         ) && <Loading />}
         <Matchup
           teamStats={teamStats}
@@ -104,6 +102,7 @@ const App = () => {
           league={league}
           week={week}
           setWeek={setWeek}
+          matchup={matchup}
         />
       </div>
     )

@@ -67,7 +67,7 @@ app.post('/api/league', async (req, res) => {
 
 app.post('/api/matchup', async (req, res) => {
   console.log(req.body)
-  const data = await app.yf.team.matchups(req.body.teamKey, [req.body.week])
+  const data = await app.yf.team.matchups(req.body.teamKey)
   res.json(data)
 })
 
