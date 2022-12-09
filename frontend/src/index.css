@@ -35,3 +35,26 @@ thead tr {
 th {
   width: 33.333%
 }
+
+h2 {
+  text-align: center;
+}
+
+.matchup h2 {
+  color: #f2f2f2;
+}
+
+.header {
+  margin: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header svg {
+  color: #f2f2f2;
+  height: 100%;
+  font-size: 2rem;
+  margin: 0 1em;
+  cursor: pointer;
+}

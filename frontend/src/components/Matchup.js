@@ -1,15 +1,33 @@
 import Table from 'react-bootstrap/Table'
 import Color from 'colorjs.io'
+import { ArrowLeftCircle, ArrowRightCircle } from 'react-bootstrap-icons'
 
-const Matchup = ({ teamStats, oppStats, league }) => {
+const Matchup = ({ teamStats, oppStats, league, week, setWeek }) => {
   const c1 = new Color('red')
   const c2 = new Color('p3', [0, 1, 0])
   const range = c1.range(c2, { space: 'hsl' })
 
   const valueToColor = (stat, other, id) => {
     let x = (parseFloat(stat) / (parseFloat(stat) + parseFloat(other))) * 0.915
-    x = id === 4 || id === 23 ? 1 - x : x //switch colors for +/- and GAA
+
+    //custom calculation for plus/minus
+    if (id === 4) {
+      let offset = Math.min(parseInt(stat), parseInt(other))
+      offset = offset < 0 ? Math.abs(offset) + 20 : 20
+      x =
+        ((parseFloat(stat) + offset) /
+          (parseFloat(stat) + parseFloat(other) + offset * 2)) *
+        0.915
+    }
+
+    x = id === 23 ? 1 - x : x //switch colors for GAA
     return range(x)
+  }
+
+  const changeWeek = (x) => {
+    if (week + x > 0) {
+      setWeek(week + x)
+    }
   }
 
   const values = league.settings.stat_categories.map((cat) => ({
@@ -25,41 +43,57 @@ const Matchup = ({ teamStats, oppStats, league }) => {
   }))
 
   return (
-    <Table bordered hover>
-      <thead>
-        <tr>
-          <th>{teamStats.name}</th>
-          <th>Category</th>
-          <th>{oppStats.name}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {values.map(
-          (cat) =>
-            !cat.is_only_display_stat && (
-              <tr key={cat.id}>
-                <td
-                  style={{
-                    background: valueToColor(cat.teamStat, cat.oppStat, cat.id)
-                  }}
-                >
-                  {cat.teamStat}
-                </td>
-                <td>
-                  <strong> {cat.name} </strong>
-                </td>
-                <td
-                  style={{
-                    background: valueToColor(cat.oppStat, cat.teamStat, cat.id)
-                  }}
-                >
-                  {cat.oppStat}
-                </td>
-              </tr>
-            )
-        )}
-      </tbody>
-    </Table>
+    <div className="matchup">
+      <div className="header">
+        <ArrowLeftCircle onClick={() => changeWeek(-1)} />
+        <h2>Week {week}</h2>
+        <ArrowRightCircle onClick={() => changeWeek(1)} />
+      </div>
+
+      <Table bordered hover>
+        <thead>
+          <tr>
+            <th>{teamStats.name}</th>
+            <th>Category</th>
+            <th>{oppStats.name}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {values.map(
+            (cat) =>
+              !cat.is_only_display_stat && (
+                <tr key={cat.id}>
+                  <td
+                    style={{
+                      background: valueToColor(
+                        cat.teamStat,
+                        cat.oppStat,
+                        cat.id
+                      )
+                    }}
+                  >
+                    {cat.teamStat}
+                  </td>
+                  <td>
+                    <strong> {cat.name} </strong>
+                  </td>
+                  <td
+                    style={{
+                      background: valueToColor(
+                        cat.oppStat,
+                        cat.teamStat,
+                        cat.id
+                      )
+                    }}
+                  >
+                    {cat.oppStat}
+                  </td>
+                </tr>
+              )
+          )}
+        </tbody>
+      </Table>
+    </div>
   )
 }
 
