@@ -2,6 +2,22 @@ body {
   background: #555;
 }
 
+.login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.login button, .login button:active {
+  background: #720e9e;
+  border: none;
+}
+
+.login button:hover {
+  background: #5b0b7e;
+}
+
 .card {
   max-width: 400px;
   margin: 2em auto;
