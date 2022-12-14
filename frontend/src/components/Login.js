@@ -18,12 +18,16 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
 
   useEffect(() => {
     const testAuth = async () => {
-      try {
-        const result = await axios.get('/api/team')
-        setTeams(result.data)
-        setAuth(true)
-      } catch (e) {
+      if (document.cookie.indexOf('loggedIn') === -1) {
         setAuth(false)
+      } else {
+        try {
+          const result = await axios.get('/api/team')
+          setTeams(result.data)
+          setAuth(true)
+        } catch (e) {
+          setAuth(false)
+        }
       }
     }
     if (auth === null) {

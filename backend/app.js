@@ -65,6 +65,10 @@ app.get('/auth/yahoo/callback', (req, res) => {
         serialize('refreshToken', app.yf.yahooRefreshToken, {
           path: '/',
           httpOnly: true
+        }),
+        serialize('loggedIn', 'true', {
+          path: '/',
+          httpOnly: false
         })
       ])
       return res.redirect(FRONTEND_URI)
@@ -84,6 +88,11 @@ app.get('/auth/logout', (req, res) => {
     serialize('refreshToken', '', {
       path: '/',
       httpOnly: true,
+      expires: new Date()
+    }),
+    serialize('loggedIn', '', {
+      path: '/',
+      httpOnly: false,
       expires: new Date()
     })
   ])
