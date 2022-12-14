@@ -14,11 +14,13 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
   const setTeam = (team) => {
     setLeagueKey(team.team_key.split('.').slice(0, 3).join('.'))
     setTeamKey(team.team_key)
+    localStorage.setItem('team', JSON.stringify(team))
   }
 
   useEffect(() => {
     const testAuth = async () => {
       if (document.cookie.indexOf('loggedIn') === -1) {
+        localStorage.removeItem('team')
         setAuth(false)
       } else {
         try {
@@ -26,6 +28,7 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
           setTeams(result.data)
           setAuth(true)
         } catch (e) {
+          localStorage.removeItem('team')
           setAuth(false)
         }
       }
@@ -34,6 +37,12 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
       testAuth()
     }
   }, [auth, setAuth])
+
+  useEffect(() => {
+    if (auth && localStorage.getItem('team')) {
+      setTeam(JSON.parse(localStorage.getItem('team')))
+    }
+  })
 
   if (auth === false) {
     return (
