@@ -33,7 +33,7 @@ Use `npm start` to start the server or `npm run dev` to start in development mod
 
 ## Frontend
 
-The Frontend is a React app. If running locally, it will automatically proxy requests to the local backend running at `https://localhost:3003/`.
+The Frontend is a React app. If running locally, it will automatically proxy backend requests to the local backend running at `https://localhost:3003/`.
 
 ### Install
 
