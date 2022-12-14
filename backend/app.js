@@ -4,6 +4,7 @@ const app = express()
 const https = require('https')
 const http = require('http')
 const cors = require('cors')
+const middleware = require('./middleware')
 const bodyParser = require('body-parser')
 const {
   PORT,
@@ -56,6 +57,16 @@ app.get('/auth/yahoo/callback', (req, res) => {
         return res.redirect('/error')
       }
       await delay(100)
+      res.setHeader('Set-Cookie', [
+        serialize('accessToken', app.yf.yahooUserToken, {
+          path: '/',
+          httpOnly: true
+        }),
+        serialize('refreshToken', app.yf.yahooRefreshToken, {
+          path: '/',
+          httpOnly: true
+        })
+      ])
       return res.redirect(FRONTEND_URI)
     })
   } catch (e) {
@@ -80,8 +91,9 @@ app.get('/auth/logout', (req, res) => {
   return res.redirect(FRONTEND_URI)
 })
 
-app.get('/api/team', async (req, res) => {
+app.get('/api/team', middleware.userExtractor, async (req, res) => {
   try {
+    app.yf.setUserToken(req.userToken)
     const data = await app.yf.user.game_teams('nhl')
     res.json(data)
   } catch (e) {
@@ -90,21 +102,21 @@ app.get('/api/team', async (req, res) => {
   }
 })
 
-app.post('/api/league', async (req, res) => {
-  console.log(req.body)
+app.post('/api/league', middleware.userExtractor, async (req, res) => {
+  app.yf.setUserToken(req.userToken)
   const data = await app.yf.league.settings(req.body.leagueKey)
   res.json(data)
 })
 
-app.post('/api/matchup', async (req, res) => {
-  console.log(req.body)
+app.post('/api/matchup', middleware.userExtractor, async (req, res) => {
+  app.yf.setUserToken(req.userToken)
   const data = await app.yf.team.matchups(req.body.teamKey)
   res.json(data)
 })
 
-app.post('/api/teamstats', async (req, res) => {
+app.post('/api/teamstats', middleware.userExtractor, async (req, res) => {
   try {
-    console.log(req.body)
+    app.yf.setUserToken(req.userToken)
     const data = await app.yf.team.stats(req.body.teamKey)
     res.json(data)
   } catch (e) {
