@@ -33,7 +33,7 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
 
   if (auth === false) {
     return (
-      <div class="login">
+      <div className="login">
         <Button variant="primary" onClick={onClickLogin} className="btn-lg">
           <TrophyFill /> Log in to Yahoo!
         </Button>
