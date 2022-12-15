@@ -14,6 +14,7 @@ const App = () => {
   const [oppStats, setOppStats] = useState(null)
   const [matchup, setMatchup] = useState(null)
   const [week, setWeek] = useState(null)
+  const [currentWeek, setCurrentWeek] = useState(null)
 
   useEffect(() => {
     const loadLeagueInfo = async () => {
@@ -23,6 +24,7 @@ const App = () => {
         })
         setLeague(result.data)
         setWeek(parseInt(result.data.current_week))
+        setCurrentWeek(parseInt(result.data.current_week))
       } catch (e) {
         console.log(e)
       }
@@ -98,6 +100,7 @@ const App = () => {
           week={week}
           setWeek={setWeek}
           matchup={matchup}
+          currentWeek={currentWeek}
         />
         <Footer />
       </div>

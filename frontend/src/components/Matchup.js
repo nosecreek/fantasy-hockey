@@ -2,7 +2,15 @@ import Table from 'react-bootstrap/Table'
 import Color from 'colorjs.io'
 import { ArrowLeftCircle, ArrowRightCircle } from 'react-bootstrap-icons'
 
-const Matchup = ({ teamStats, oppStats, league, week, setWeek, matchup }) => {
+const Matchup = ({
+  teamStats,
+  oppStats,
+  league,
+  week,
+  setWeek,
+  matchup,
+  currentWeek
+}) => {
   const c1 = new Color('red')
   const c2 = new Color('p3', [0, 1, 0])
   const range = c1.range(c2, { space: 'hsl' })
@@ -49,6 +57,13 @@ const Matchup = ({ teamStats, oppStats, league, week, setWeek, matchup }) => {
     is_only_display_stat: cat.is_only_display_stat || false
   }))
 
+  const getAvg = (cat, stat) => {
+    if (cat.id === 26 || cat.id === 23) return stat
+    const dayofweek = new Date().getDay()
+    const dayoffset = dayofweek === 6 ? 0 : (dayofweek + 1) / 7
+    return (stat / (currentWeek - 1 + dayoffset)).toFixed(2)
+  }
+
   return (
     <div className="matchup">
       <div className="header">
@@ -86,6 +101,7 @@ const Matchup = ({ teamStats, oppStats, league, week, setWeek, matchup }) => {
                     }}
                   >
                     {cat.teamStat}
+                    <span className="avg">{getAvg(cat, cat.teamStat)}</span>
                   </td>
                   <td>
                     <strong> {cat.name} </strong>
@@ -100,6 +116,7 @@ const Matchup = ({ teamStats, oppStats, league, week, setWeek, matchup }) => {
                     }}
                   >
                     {cat.oppStat}
+                    <span className="avg">{getAvg(cat, cat.oppStat)}</span>
                   </td>
                 </tr>
               )

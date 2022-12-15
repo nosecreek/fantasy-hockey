@@ -53,6 +53,17 @@ th {
   width: 33.333%
 }
 
+td {
+  vertical-align: middle;
+  font-weight: bold;
+}
+
+.avg {
+  font-weight: 400;
+  color: #555;
+  display: block;
+}
+
 h2 {
   text-align: center;
 }
