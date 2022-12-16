@@ -106,7 +106,6 @@ const App = () => {
       </div>
     )
   } catch (e) {
-    console.log(e)
     return <Loading />
   }
 }

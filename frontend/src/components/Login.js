@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
 import axios from 'axios'
 import { TrophyFill } from 'react-bootstrap-icons'
+import { MdSportsHockey } from 'react-icons/md'
 
 const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
   const [teams, setTeams] = useState(null)
@@ -47,9 +48,17 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
   if (auth === false) {
     return (
       <div className="login">
-        <Button variant="primary" onClick={onClickLogin} className="btn-lg">
-          <TrophyFill /> Log in to Yahoo!
-        </Button>
+        <div className="loginBox">
+          <h1>Fantasy Hockey Helper</h1>
+          <Button variant="primary" onClick={onClickLogin} className="btn-lg">
+            <TrophyFill /> Log in to Yahoo!
+          </Button>
+          <MdSportsHockey className="icon" />
+          <p>
+            A tool for analyzing your weekly matchups in Yahoo! head-to-head
+            leagues. Login with Yahoo! to continue.
+          </p>
+        </div>
       </div>
     )
   }

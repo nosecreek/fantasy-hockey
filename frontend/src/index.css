@@ -7,15 +7,37 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
+  padding: 0 2em;
+}
+
+.login-box {
+  text-align: center;
+}
+
+.login h1 {
+  display: block;
+  color: #f2f2f2;
+  padding: 1em 0;
 }
 
 .login button, .login button:active {
-  background: #720e9e;
+  background: #720e9e !important;
   border: none;
 }
 
 .login button:hover {
   background: #5b0b7e;
+}
+
+.login .icon {
+  font-size: 2em;
+  color: #f2f2f2;
+  display: block;
+  margin: .5em auto;
+}
+
+.login p {
+  color: #fff;
 }
 
 .card {
