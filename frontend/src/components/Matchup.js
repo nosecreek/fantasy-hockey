@@ -1,6 +1,7 @@
 import Table from 'react-bootstrap/Table'
 import Color from 'colorjs.io'
 import { ArrowLeftCircle, ArrowRightCircle } from 'react-bootstrap-icons'
+import { useEffect } from 'react'
 
 const Matchup = ({
   teamStats,
@@ -43,6 +44,7 @@ const Matchup = ({
     if (week + x > 0 && week + x < matchup.matchups.length + 1) {
       setWeek(week + x)
     }
+    console.log(x)
   }
 
   const values = league.settings.stat_categories.map((cat) => ({
@@ -63,6 +65,18 @@ const Matchup = ({
     const dayoffset = dayofweek === 6 ? 0 : (dayofweek + 1) / 7
     return (stat / (currentWeek - 1 + dayoffset)).toFixed(2)
   }
+
+  useEffect(() => {
+    const handleKeydown = (event) => {
+      if (event.keyCode === 37) changeWeek(-1)
+      else if (event.keyCode === 39) changeWeek(1)
+    }
+    window.addEventListener('keydown', handleKeydown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeydown)
+    }
+  })
 
   return (
     <div className="matchup">
