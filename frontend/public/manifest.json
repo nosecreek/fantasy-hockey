@@ -1,5 +1,5 @@
 {
-  "short_name": "Fantasy hockey",
+  "short_name": "Fantasy Hockey",
   "name": "Fantasy Hockey Helper",
   "icons": [
     {
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#f2f2f2",
-  "background_color": "#333"
+  "theme_color": "#333",
+  "background_color": "#f2f2f2"
 }
