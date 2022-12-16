@@ -105,7 +105,8 @@ const App = () => {
         <Footer />
       </div>
     )
-  } catch {
+  } catch (e) {
+    console.log(e)
     return <Loading />
   }
 }

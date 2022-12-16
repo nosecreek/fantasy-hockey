@@ -55,21 +55,38 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
   }
 
   if (auth && teams) {
-    return (
-      <Card>
-        <h2>Select Your Team</h2>
-        {teams['teams'][0]['teams'].map((team) => (
-          <div onClick={() => setTeam(team)} key={team.team_key}>
-            <h3>{team.name}</h3>
-            <img
-              src={team['team_logos'][0].url}
-              alt="Team Logo"
-              className="rounded-circle"
-            />
-          </div>
-        ))}
-      </Card>
-    )
+    const teamsList = teams['teams']
+      .flatMap((league) => (league.code === 'nhl' ? league.teams : []))
+      .filter((team) => team.league_scoring_type.includes('head'))
+    if (teamsList.length) {
+      return (
+        <div className="login">
+          <Card>
+            <h2>Select Your Team</h2>
+            {teamsList.map((team) => (
+              <div onClick={() => setTeam(team)} key={team.team_key}>
+                <h3>{team.name}</h3>
+                <img
+                  src={team['team_logos'][0].url}
+                  alt="Team Logo"
+                  className="rounded-circle"
+                />
+              </div>
+            ))}
+          </Card>
+        </div>
+      )
+    } else {
+      return (
+        <Card>
+          <h2>Select Your Team</h2>
+          <p>
+            Sorry, no supported teams found. This app currently only works with
+            Fantasy Hockey leagues which use head-to-head matchups.
+          </p>
+        </Card>
+      )
+    }
   }
 }
 

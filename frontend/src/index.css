@@ -27,7 +27,7 @@ body {
 }
 
 .card img {
-  max-width: 150px;
+  max-width: 75px;
 }
 
 
@@ -50,7 +50,8 @@ thead tr {
 }
 
 th {
-  width: 33.333%
+  width: 33.333%;
+  vertical-align: middle;
 }
 
 td {
