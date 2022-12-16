@@ -4,6 +4,7 @@ import Matchup from './components/Matchup'
 import Login from './components/Login'
 import Loading from './components/Loading'
 import Footer from './components/Footer'
+import Help from './components/Help'
 
 const App = () => {
   const [auth, setAuth] = useState(null)
@@ -15,6 +16,7 @@ const App = () => {
   const [matchup, setMatchup] = useState(null)
   const [week, setWeek] = useState(null)
   const [currentWeek, setCurrentWeek] = useState(null)
+  const [helpScreen, setHelpScreen] = useState(false)
 
   useEffect(() => {
     const loadLeagueInfo = async () => {
@@ -77,6 +79,8 @@ const App = () => {
     }
   }, [matchup, week, teamKey])
 
+  if (helpScreen) return <Help setHelpScreen={setHelpScreen} />
+
   if (!teamKey)
     return (
       <Login
@@ -102,7 +106,7 @@ const App = () => {
           matchup={matchup}
           currentWeek={currentWeek}
         />
-        <Footer />
+        <Footer setHelpScreen={setHelpScreen} />
       </div>
     )
   } catch (e) {
