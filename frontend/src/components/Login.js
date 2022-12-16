@@ -5,7 +5,7 @@ import axios from 'axios'
 import { TrophyFill } from 'react-bootstrap-icons'
 import { MdSportsHockey } from 'react-icons/md'
 
-const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
+const Login = ({ auth, setAuth, setTeamKey, setLeagueKey, setHelpScreen }) => {
   const [teams, setTeams] = useState(null)
 
   const onClickLogin = () => {
@@ -16,6 +16,11 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
     setLeagueKey(team.team_key.split('.').slice(0, 3).join('.'))
     setTeamKey(team.team_key)
     localStorage.setItem('team', JSON.stringify(team))
+  }
+
+  const displayHelp = (e) => {
+    e.preventDefault()
+    setHelpScreen(true)
   }
 
   useEffect(() => {
@@ -56,7 +61,11 @@ const Login = ({ auth, setAuth, setTeamKey, setLeagueKey }) => {
           <MdSportsHockey className="icon" />
           <p>
             A tool for analyzing your weekly matchups in Yahoo! head-to-head
-            leagues. Login with Yahoo! to continue.
+            leagues. Login with Yahoo! to continue or{' '}
+            <a href="/" onClick={(e) => displayHelp(e)}>
+              click here to learn more
+            </a>
+            .
           </p>
         </div>
       </div>

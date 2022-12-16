@@ -88,6 +88,7 @@ const App = () => {
         setAuth={setAuth}
         setTeamKey={setTeamKey}
         setLeagueKey={setLeagueKey}
+        setHelpScreen={setHelpScreen}
       />
     )
 

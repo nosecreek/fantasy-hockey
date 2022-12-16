@@ -180,6 +180,6 @@ td.swatch div {
   margin: 1em 0;
 }
 
-.footer a {
+.footer a, .login a {
   color: #f2f2f2;
 }
