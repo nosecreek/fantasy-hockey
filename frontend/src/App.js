@@ -7,7 +7,6 @@ import Footer from './components/Footer'
 import Help from './components/Help'
 
 const App = () => {
-  const [auth, setAuth] = useState(null)
   const [teamKey, setTeamKey] = useState(null)
   const [leagueKey, setLeagueKey] = useState(null)
   const [league, setLeague] = useState(null)
@@ -84,8 +83,6 @@ const App = () => {
   if (!teamKey)
     return (
       <Login
-        auth={auth}
-        setAuth={setAuth}
         setTeamKey={setTeamKey}
         setLeagueKey={setLeagueKey}
         setHelpScreen={setHelpScreen}
