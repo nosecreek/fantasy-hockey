@@ -7,7 +7,7 @@ import Footer from '../components/Footer'
 describe('Rendering the Footer', () => {
   const setHelpScreen = jest.fn()
 
-  test('footer display the correct content', async () => {
+  test('footer displays the correct content', async () => {
     render(<Footer />)
 
     expect(screen.getByText(/Help/)).toBeDefined()
