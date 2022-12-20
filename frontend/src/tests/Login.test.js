@@ -4,9 +4,9 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Login from '../components/Login'
 import axios from 'axios'
-import { teams } from './axiosValues'
+import { teams, team, leagueKey, teamKey } from './axiosValues'
 
-describe('Rendering the Login Screen', () => {
+describe('Login Screen', () => {
   const setTeamKey = jest.fn()
   const setLeagueKey = jest.fn()
   const setHelpScreen = jest.fn()
@@ -62,16 +62,29 @@ describe('Rendering the Login Screen', () => {
     expect(setHelpScreen.mock.calls).toHaveLength(1)
     expect(setHelpScreen.mock.calls[0][0]).toBe(true)
   })
+})
 
-  test('if authorized, show team selection', async () => {
+describe('Team Selection', () => {
+  const setTeamKey = jest.fn()
+  const setLeagueKey = jest.fn()
+  const setHelpScreen = jest.fn()
+  let mockAxios
+
+  beforeEach(() => {
     Object.defineProperty(window.document, 'cookie', {
       writable: true,
       value: 'loggedIn=true'
     })
 
-    jest
-      .spyOn(axios, 'get')
-      .mockReturnValueOnce(Promise.resolve({ data: JSON.parse(teams) }))
+    mockAxios = jest.spyOn(axios, 'get')
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  test('if authorized, show team selection', async () => {
+    mockAxios.mockReturnValueOnce(Promise.resolve({ data: JSON.parse(teams) }))
 
     render(
       <Login
@@ -86,5 +99,76 @@ describe('Rendering the Login Screen', () => {
 
     expect(title).toBeDefined()
     expect(teamName).toBeDefined()
+  })
+
+  test('skip team selection if saved in localstorage', async () => {
+    mockAxios.mockReturnValueOnce(Promise.resolve({ data: JSON.parse(teams) }))
+    Storage.prototype.getItem = jest.fn(() => team)
+
+    render(
+      <Login
+        setTeamKey={setTeamKey}
+        setLeagueKey={setLeagueKey}
+        setHelpScreen={setHelpScreen}
+      />
+    )
+
+    await screen.findByText(/Select Your Team/)
+
+    expect(setLeagueKey.mock.calls).toHaveLength(1)
+    expect(setLeagueKey.mock.calls[0][0]).toBe(leagueKey)
+    expect(setTeamKey.mock.calls).toHaveLength(1)
+    expect(setTeamKey.mock.calls[0][0]).toBe(teamKey)
+  })
+
+  test('choosing a team updates state properly', async () => {
+    mockAxios.mockReturnValueOnce(Promise.resolve({ data: JSON.parse(teams) }))
+    render(
+      <Login
+        setTeamKey={setTeamKey}
+        setLeagueKey={setLeagueKey}
+        setHelpScreen={setHelpScreen}
+      />
+    )
+
+    const teamName = await screen.findByText(/The Roman Yoshis/)
+    userEvent.click(teamName)
+
+    expect(setLeagueKey.mock.calls).toHaveLength(1)
+    expect(setLeagueKey.mock.calls[0][0]).toBe(leagueKey)
+    expect(setTeamKey.mock.calls).toHaveLength(1)
+    expect(setTeamKey.mock.calls[0][0]).toBe(teamKey)
+  })
+
+  test('show login screen if api auth fails', async () => {
+    mockAxios.mockRejectedValueOnce()
+    render(
+      <Login
+        setTeamKey={setTeamKey}
+        setLeagueKey={setLeagueKey}
+        setHelpScreen={setHelpScreen}
+      />
+    )
+
+    const loginButton = await screen.findByText(/Log in to Yahoo!/)
+    expect(loginButton).toBeDefined()
+  })
+
+  test('show error message if no teams of correct type', async () => {
+    const badTeams = JSON.parse(teams)
+    badTeams.teams[0].code = 'nba'
+    mockAxios.mockReturnValueOnce(Promise.resolve({ data: badTeams }))
+
+    render(
+      <Login
+        setTeamKey={setTeamKey}
+        setLeagueKey={setLeagueKey}
+        setHelpScreen={setHelpScreen}
+      />
+    )
+
+    const message = await screen.findByText(/no supported teams found/)
+
+    expect(message).toBeDefined()
   })
 })
