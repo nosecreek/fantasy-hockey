@@ -5,7 +5,8 @@ import axios from 'axios'
 import { TrophyFill } from 'react-bootstrap-icons'
 import { MdSportsHockey } from 'react-icons/md'
 
-const Login = ({ auth, setAuth, setTeamKey, setLeagueKey, setHelpScreen }) => {
+const Login = ({ setTeamKey, setLeagueKey, setHelpScreen }) => {
+  const [auth, setAuth] = useState(null)
   const [teams, setTeams] = useState(null)
 
   const onClickLogin = () => {

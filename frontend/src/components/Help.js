@@ -27,6 +27,7 @@ const Help = ({ setHelpScreen }) => {
             <td>Less Likely</td>
             <td className="swatch">
               <div
+                title="Color Gradient"
                 style={{
                   '--stops': steps
                 }}
