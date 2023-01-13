@@ -54,6 +54,28 @@ const App = () => {
   }, [lastMonth, leagueKey, yesterday])
 
   useEffect(() => {
+    //Load team stats
+    const getTeamStats = async () => {
+      const result = await axios.post('/api/teamstats', {
+        teamKey: teamKey
+      })
+      setTeamStats(result.data)
+    }
+    if (teamKey && !teamStats) getTeamStats()
+  }, [teamKey, teamStats])
+
+  useEffect(() => {
+    //Load team roster
+    const getRosters = async () => {
+      const result = await axios.post('/api/rosters', {
+        teamKeys: [teamKey]
+      })
+      setTeamRoster(result.data.team)
+    }
+    if (teamKey && !teamRoster) getRosters()
+  }, [teamKey, teamRoster])
+
+  useEffect(() => {
     const loadMatchup = async () => {
       try {
         const result = await axios.post('/api/matchup', {
@@ -72,17 +94,6 @@ const App = () => {
 
   useEffect(() => {
     const loadStats = async () => {
-      //Load team stats
-      const getTeamStats = async () => {
-        if (!teamStats) {
-          const result = await axios.post('/api/teamstats', {
-            teamKey: teamKey
-          })
-          return result.data
-        }
-        return teamStats
-      }
-
       //Load opponent stats
       const getOppStats = async () => {
         const result = await axios.post('/api/teamstats', {
@@ -91,25 +102,12 @@ const App = () => {
         return result.data
       }
 
-      //Load team rosters
-      const getRosters = async () => {
-        if (!teamRoster) {
-          const result = await axios.post('/api/rosters', {
-            teamKeys: [teamKey, matchup.matchups[week - 1].teams[1].team_key]
-          })
-          return {
-            teamRoster: result.data.team,
-            oppRoster: result.data.opp
-          }
-        } else {
-          const result = await axios.post('/api/rosters', {
-            teamKeys: [matchup.matchups[week - 1].teams[1].team_key]
-          })
-          return {
-            teamRoster: teamRoster,
-            oppRoster: result.data.team
-          }
-        }
+      //Load opponent roster
+      const getOppRoster = async () => {
+        const result = await axios.post('/api/rosters', {
+          teamKeys: [matchup.matchups[week - 1].teams[1].team_key]
+        })
+        return result.data.team
       }
 
       //Load nhl schedule
@@ -122,34 +120,43 @@ const App = () => {
         return result.data
       }
 
-      let newTeamStats, oppStats, rosters, schedule
+      //Resolve promises
+      let oppStats, oppRoster, schedule
       try {
-        ;[newTeamStats, oppStats, rosters, schedule] = await Promise.all([
-          getTeamStats(),
+        ;[oppStats, oppRoster, schedule] = await Promise.all([
           getOppStats(),
-          getRosters(),
+          getOppRoster(),
           getSchedule()
         ])
       } catch (e) {}
 
       //Get Matchup Stats
       const stats = await getStats(
-        newTeamStats,
+        teamStats,
         oppStats,
-        rosters.teamRoster,
-        rosters.oppRoster,
+        teamRoster,
+        oppRoster,
         league,
         schedule,
         lastMonthSchedule
       )
+
+      //Set State
       setStats(stats)
-      if (!teamStats) setTeamStats(newTeamStats)
-      if (!teamRoster) setTeamRoster(rosters.teamRoster)
       setOppStats(oppStats)
     }
 
-    if (matchup && week && teamKey && league && lastMonthSchedule) loadStats()
-  }, [matchup, week, teamKey, league, teamStats, teamRoster, lastMonthSchedule])
+    if (
+      matchup &&
+      week &&
+      teamKey &&
+      league &&
+      lastMonthSchedule &&
+      teamStats &&
+      teamRoster
+    )
+      loadStats()
+  }, [lastMonthSchedule, league, matchup, teamKey, teamRoster, teamStats, week])
 
   if (helpScreen) return <Help setHelpScreen={setHelpScreen} />
 
