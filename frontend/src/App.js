@@ -59,14 +59,16 @@ const App = () => {
   useEffect(() => {
     const loadStats = async () => {
       //Load team stats
-      let teamStats
-      try {
-        const result = await axios.post('/api/teamstats', {
-          teamKey: teamKey
-        })
-        teamStats = result.data
-      } catch (e) {
-        console.log(e)
+      let newTeamStats
+      if (!teamStats) {
+        try {
+          const result = await axios.post('/api/teamstats', {
+            teamKey: teamKey
+          })
+          newTeamStats = result.data
+        } catch (e) {
+          console.log(e)
+        }
       }
 
       //Load opponent stats
@@ -85,17 +87,17 @@ const App = () => {
         matchup,
         week,
         teamKey,
-        teamStats,
+        teamStats || newTeamStats,
         oppStats,
         league
       )
       setStats(stats)
-      setTeamStats(teamStats)
+      if (!teamStats) setTeamStats(newTeamStats)
       setOppStats(oppStats)
     }
 
     if (matchup && week && teamKey && league) loadStats()
-  }, [matchup, week, teamKey, league])
+  }, [matchup, week, teamKey, league, teamStats])
 
   if (helpScreen) return <Help setHelpScreen={setHelpScreen} />
 
