@@ -12,9 +12,13 @@ const App = () => {
   const [league, setLeague] = useState(null)
   const [teamStats, setTeamStats] = useState(null)
   const [oppStats, setOppStats] = useState(null)
+  const [teamRoster, setTeamRoster] = useState(null)
+  const [oppRoster, setOppRoster] = useState(null)
   const [matchup, setMatchup] = useState(null)
   const [week, setWeek] = useState(null)
   const [currentWeek, setCurrentWeek] = useState(null)
+  const [schedule, setSchedule] = useState(null)
+  const [seasonStats, setSeasonStats] = useState()
   const [helpScreen, setHelpScreen] = useState(false)
 
   useEffect(() => {
@@ -55,6 +59,7 @@ const App = () => {
 
   useEffect(() => {
     const loadStats = async () => {
+      //Load team stats
       try {
         const result = await axios.post('/api/teamstats', {
           teamKey: teamKey
@@ -63,6 +68,8 @@ const App = () => {
       } catch (e) {
         console.log(e)
       }
+
+      //Load opponent stats
       try {
         const result = await axios.post('/api/teamstats', {
           teamKey: matchup.matchups[week - 1].teams[1].team_key
@@ -71,6 +78,42 @@ const App = () => {
       } catch (e) {
         console.log(e)
       }
+
+      //Load team rosters
+      try {
+        const result = await axios.post('/api/rosters', {
+          teamKeys: [teamKey, matchup.matchups[week - 1].teams[1].team_key]
+        })
+        setTeamRoster(result.data.team)
+        setOppRoster(result.data.opp)
+        console.log(result.data)
+      } catch (e) {
+        console.log(e)
+      }
+
+      //Load nhl schedule
+      try {
+        const result = await axios.get(
+          `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${
+            matchup.matchups[week - 1].week_start
+          }&endDate=${matchup.matchups[week - 1].week_end}`
+        )
+        setSchedule(result.data)
+        console.log(result.data)
+      } catch (e) {
+        console.log(e)
+      }
+
+      //Load nhl season stats
+      // try {
+      //   const result = await axios.get(
+      //     'https://statsapi.web.nhl.com/api/v1/teams?expand=team.stats'
+      //   )
+      //   setSeasonStats(result.data)
+      //   console.log(result.data)
+      // } catch (e) {
+      //   console.log(e)
+      // }
     }
 
     if (matchup && teamKey) {
@@ -103,6 +146,10 @@ const App = () => {
           setWeek={setWeek}
           matchup={matchup}
           currentWeek={currentWeek}
+          teamRoster={teamRoster}
+          oppRoster={oppRoster}
+          schedule={schedule}
+          // seasonStats={seasonStats}
         />
         <Footer setHelpScreen={setHelpScreen} />
       </div>
