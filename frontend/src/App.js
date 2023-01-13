@@ -18,7 +18,6 @@ const App = () => {
   const [week, setWeek] = useState(null)
   const [currentWeek, setCurrentWeek] = useState(null)
   const [schedule, setSchedule] = useState(null)
-  const [seasonStats, setSeasonStats] = useState()
   const [helpScreen, setHelpScreen] = useState(false)
 
   useEffect(() => {
@@ -103,17 +102,6 @@ const App = () => {
       } catch (e) {
         console.log(e)
       }
-
-      //Load nhl season stats
-      // try {
-      //   const result = await axios.get(
-      //     'https://statsapi.web.nhl.com/api/v1/teams?expand=team.stats'
-      //   )
-      //   setSeasonStats(result.data)
-      //   console.log(result.data)
-      // } catch (e) {
-      //   console.log(e)
-      // }
     }
 
     if (matchup && teamKey) {
@@ -149,7 +137,6 @@ const App = () => {
           teamRoster={teamRoster}
           oppRoster={oppRoster}
           schedule={schedule}
-          // seasonStats={seasonStats}
         />
         <Footer setHelpScreen={setHelpScreen} />
       </div>
