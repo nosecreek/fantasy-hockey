@@ -14,7 +14,7 @@ const App = () => {
   const [stats, setStats] = useState(null)
   const [teamStats, setTeamStats] = useState(null)
   const [oppStats, setOppStats] = useState(null)
-  // const [teamRoster, setTeamRoster] = useState(null)
+  const [teamRoster, setTeamRoster] = useState(null)
   const [matchup, setMatchup] = useState(null)
   const [week, setWeek] = useState(null)
   const [currentWeek, setCurrentWeek] = useState(null)
@@ -59,45 +59,82 @@ const App = () => {
   useEffect(() => {
     const loadStats = async () => {
       //Load team stats
-      let newTeamStats
-      if (!teamStats) {
-        try {
+      const getTeamStats = async () => {
+        if (!teamStats) {
           const result = await axios.post('/api/teamstats', {
             teamKey: teamKey
           })
-          newTeamStats = result.data
-        } catch (e) {
-          console.log(e)
+          return result.data
         }
+        return teamStats
       }
 
       //Load opponent stats
-      let oppStats
-      try {
+      const getOppStats = async () => {
         const result = await axios.post('/api/teamstats', {
           teamKey: matchup.matchups[week - 1].teams[1].team_key
         })
-        oppStats = result.data
-      } catch (e) {
-        console.log(e)
+        return result.data
       }
+
+      //Load team rosters
+      const getRosters = async () => {
+        if (!teamRoster) {
+          const result = await axios.post('/api/rosters', {
+            teamKeys: [teamKey, matchup.matchups[week - 1].teams[1].team_key]
+          })
+          return {
+            teamRoster: result.data.team,
+            oppRoster: result.data.opp
+          }
+        } else {
+          const result = await axios.post('/api/rosters', {
+            teamKeys: [matchup.matchups[week - 1].teams[1].team_key]
+          })
+          return {
+            teamRoster: teamRoster,
+            oppRoster: result.data.team
+          }
+        }
+      }
+
+      //Load nhl schedule
+      const getSchedule = async () => {
+        const result = await axios.get(
+          `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${
+            matchup.matchups[week - 1].week_start
+          }&endDate=${matchup.matchups[week - 1].week_end}`
+        )
+        return result.data
+      }
+
+      let newTeamStats, oppStats, rosters, schedule
+      try {
+        ;[newTeamStats, oppStats, rosters, schedule] = await Promise.all([
+          getTeamStats(),
+          getOppStats(),
+          getRosters(),
+          getSchedule()
+        ])
+      } catch (e) {}
 
       //Get Matchup Stats
       const stats = await getStats(
-        matchup,
-        week,
-        teamKey,
-        teamStats || newTeamStats,
+        newTeamStats,
         oppStats,
-        league
+        rosters.teamRoster,
+        rosters.oppRoster,
+        league,
+        schedule
       )
       setStats(stats)
       if (!teamStats) setTeamStats(newTeamStats)
+      if (!teamRoster) setTeamRoster(rosters.teamRoster)
       setOppStats(oppStats)
     }
 
     if (matchup && week && teamKey && league) loadStats()
-  }, [matchup, week, teamKey, league, teamStats])
+  }, [matchup, week, teamKey, league, teamStats, teamRoster])
 
   if (helpScreen) return <Help setHelpScreen={setHelpScreen} />
 

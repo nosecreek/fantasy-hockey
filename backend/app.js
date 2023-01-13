@@ -140,21 +140,25 @@ app.post('/api/rosters', middleware.userExtractor, async (req, res) => {
     console.log(req.body.teamKeys)
     const players = await app.yf.players.teams([req.body.teamKeys])
     const player_ids = players[0].players.map((player) => player.player_key)
-    const opp_player_ids = players[1].players.map((player) => player.player_key)
+    const opp_player_ids =
+      players?.[1]?.players.map((player) => player.player_key) || null
     let player_data = {}
-
-    try {
-      player_data.team = await app.yf.players.fetch(player_ids, ['stats'])
-    } catch (e) {
-      console.log(e)
+    if (opp_player_ids) {
+      try {
+        ;[player_data.team, player_data.opp] = await Promise.all([
+          app.yf.players.fetch(player_ids, ['stats']),
+          app.yf.players.fetch(opp_player_ids, ['stats'])
+        ])
+      } catch (e) {
+        console.log(e)
+      }
+    } else {
+      try {
+        player_data.team = await app.yf.players.fetch(player_ids, ['stats'])
+      } catch (e) {
+        console.log(e)
+      }
     }
-
-    try {
-      player_data.opp = await app.yf.players.fetch(opp_player_ids, ['stats'])
-    } catch (e) {
-      console.log(e)
-    }
-
     res.json(player_data)
   } catch (e) {
     console.log(e)
