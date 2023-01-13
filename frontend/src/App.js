@@ -19,16 +19,30 @@ const App = () => {
   const [week, setWeek] = useState(null)
   const [currentWeek, setCurrentWeek] = useState(null)
   const [helpScreen, setHelpScreen] = useState(false)
+  const [lastMonthSchedule, setLastMonthSchedule] = useState(null)
+
+  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
+    .toISOString()
+    .split('T')[0]
+  const lastMonth = new Date(new Date().setMonth(new Date().getMonth() - 1))
+    .toISOString()
+    .split('T')[0]
 
   useEffect(() => {
     const loadLeagueInfo = async () => {
       try {
-        const result = await axios.post('/api/league', {
-          leagueKey: leagueKey
-        })
-        setLeague(result.data)
-        setWeek(parseInt(result.data.current_week))
-        setCurrentWeek(parseInt(result.data.current_week))
+        const [league, schedule] = await Promise.all([
+          axios.post('/api/league', {
+            leagueKey: leagueKey
+          }),
+          axios.get(
+            `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${lastMonth}&endDate=${yesterday}`
+          )
+        ])
+        setLeague(league.data)
+        setWeek(parseInt(league.data.current_week))
+        setCurrentWeek(parseInt(league.data.current_week))
+        setLastMonthSchedule(schedule.data)
       } catch (e) {
         console.log(e)
       }
@@ -37,7 +51,7 @@ const App = () => {
     if (leagueKey) {
       loadLeagueInfo()
     }
-  }, [leagueKey])
+  }, [lastMonth, leagueKey, yesterday])
 
   useEffect(() => {
     const loadMatchup = async () => {
@@ -125,7 +139,8 @@ const App = () => {
         rosters.teamRoster,
         rosters.oppRoster,
         league,
-        schedule
+        schedule,
+        lastMonthSchedule
       )
       setStats(stats)
       if (!teamStats) setTeamStats(newTeamStats)
@@ -133,8 +148,8 @@ const App = () => {
       setOppStats(oppStats)
     }
 
-    if (matchup && week && teamKey && league) loadStats()
-  }, [matchup, week, teamKey, league, teamStats, teamRoster])
+    if (matchup && week && teamKey && league && lastMonthSchedule) loadStats()
+  }, [matchup, week, teamKey, league, teamStats, teamRoster, lastMonthSchedule])
 
   if (helpScreen) return <Help setHelpScreen={setHelpScreen} />
 
