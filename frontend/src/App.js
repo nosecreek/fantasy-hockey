@@ -5,19 +5,19 @@ import Login from './components/Login'
 import Loading from './components/Loading'
 import Footer from './components/Footer'
 import Help from './components/Help'
+import getStats from './functions/getStats'
 
 const App = () => {
   const [teamKey, setTeamKey] = useState(null)
   const [leagueKey, setLeagueKey] = useState(null)
   const [league, setLeague] = useState(null)
+  const [stats, setStats] = useState(null)
   const [teamStats, setTeamStats] = useState(null)
   const [oppStats, setOppStats] = useState(null)
-  const [teamRoster, setTeamRoster] = useState(null)
-  const [oppRoster, setOppRoster] = useState(null)
+  // const [teamRoster, setTeamRoster] = useState(null)
   const [matchup, setMatchup] = useState(null)
   const [week, setWeek] = useState(null)
   const [currentWeek, setCurrentWeek] = useState(null)
-  const [schedule, setSchedule] = useState(null)
   const [helpScreen, setHelpScreen] = useState(false)
 
   useEffect(() => {
@@ -59,55 +59,43 @@ const App = () => {
   useEffect(() => {
     const loadStats = async () => {
       //Load team stats
+      let teamStats
       try {
         const result = await axios.post('/api/teamstats', {
           teamKey: teamKey
         })
-        setTeamStats(result.data)
+        teamStats = result.data
       } catch (e) {
         console.log(e)
       }
 
       //Load opponent stats
+      let oppStats
       try {
         const result = await axios.post('/api/teamstats', {
           teamKey: matchup.matchups[week - 1].teams[1].team_key
         })
-        setOppStats(result.data)
+        oppStats = result.data
       } catch (e) {
         console.log(e)
       }
 
-      //Load team rosters
-      try {
-        const result = await axios.post('/api/rosters', {
-          teamKeys: [teamKey, matchup.matchups[week - 1].teams[1].team_key]
-        })
-        setTeamRoster(result.data.team)
-        setOppRoster(result.data.opp)
-        console.log(result.data)
-      } catch (e) {
-        console.log(e)
-      }
-
-      //Load nhl schedule
-      try {
-        const result = await axios.get(
-          `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${
-            matchup.matchups[week - 1].week_start
-          }&endDate=${matchup.matchups[week - 1].week_end}`
-        )
-        setSchedule(result.data)
-        console.log(result.data)
-      } catch (e) {
-        console.log(e)
-      }
+      //Get Matchup Stats
+      const stats = await getStats(
+        matchup,
+        week,
+        teamKey,
+        teamStats,
+        oppStats,
+        league
+      )
+      setStats(stats)
+      setTeamStats(teamStats)
+      setOppStats(oppStats)
     }
 
-    if (matchup && teamKey) {
-      loadStats()
-    }
-  }, [matchup, week, teamKey])
+    if (matchup && week && teamKey && league) loadStats()
+  }, [matchup, week, teamKey, league])
 
   if (helpScreen) return <Help setHelpScreen={setHelpScreen} />
 
@@ -121,6 +109,7 @@ const App = () => {
     )
 
   try {
+    console.log(oppStats.team_key, matchup.matchups[week - 1].teams[1].team_key)
     return (
       <div>
         {!(
@@ -129,14 +118,11 @@ const App = () => {
         <Matchup
           teamStats={teamStats}
           oppStats={oppStats}
-          league={league}
           week={week}
           setWeek={setWeek}
           matchup={matchup}
           currentWeek={currentWeek}
-          teamRoster={teamRoster}
-          oppRoster={oppRoster}
-          schedule={schedule}
+          stats={stats}
         />
         <Footer setHelpScreen={setHelpScreen} />
       </div>

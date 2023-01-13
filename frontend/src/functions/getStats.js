@@ -98,13 +98,38 @@ const calculatePredicted = async (
 }
 
 const getStats = async (
-  league,
+  matchup,
+  week,
+  teamKey,
   teamStats,
   oppStats,
-  teamRoster,
-  oppRoster,
-  schedule
+  league
 ) => {
+  let teamRoster, oppRoster, schedule
+
+  //Load team rosters
+  try {
+    const result = await axios.post('/api/rosters', {
+      teamKeys: [teamKey, matchup.matchups[week - 1].teams[1].team_key]
+    })
+    teamRoster = result.data.team
+    oppRoster = result.data.opp
+  } catch (e) {
+    console.log(e)
+  }
+
+  //Load nhl schedule
+  try {
+    const result = await axios.get(
+      `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${
+        matchup.matchups[week - 1].week_start
+      }&endDate=${matchup.matchups[week - 1].week_end}`
+    )
+    schedule = result.data
+  } catch (e) {
+    console.log(e)
+  }
+
   let stats = league.settings.stat_categories.map((cat) => ({
     id: cat.stat_id,
     name: cat.name,

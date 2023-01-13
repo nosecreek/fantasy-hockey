@@ -1,43 +1,21 @@
 import Table from 'react-bootstrap/Table'
 import { ArrowLeftCircle, ArrowRightCircle } from 'react-bootstrap-icons'
-import { useEffect, useState } from 'react'
-import getStats from '../functions/getStats'
+import { useEffect } from 'react'
 import matchupFunctions from '../functions/matchup'
 const Matchup = ({
   teamStats,
   oppStats,
-  league,
   week,
   setWeek,
   matchup,
   currentWeek,
-  teamRoster,
-  oppRoster,
-  schedule
+  stats
 }) => {
-  const [stats, setStats] = useState(null)
-
   const changeWeek = (x) => {
     if (week + x > 0 && week + x < matchup.matchups.length + 1) {
       setWeek(week + x)
     }
   }
-
-  useEffect(() => {
-    const loadStats = async () => {
-      const stats = await getStats(
-        league,
-        teamStats,
-        oppStats,
-        teamRoster,
-        oppRoster,
-        schedule
-      )
-      setStats(stats)
-    }
-    if (league && teamStats && oppStats && teamRoster && oppRoster && schedule)
-      loadStats()
-  }, [league, teamRoster, oppRoster, schedule, teamStats, oppStats])
 
   useEffect(() => {
     const handleKeydown = (event) => {
@@ -52,7 +30,7 @@ const Matchup = ({
   })
 
   if (!stats) return <div className="matchup"></div>
-  console.log(stats)
+
   return (
     <div className="matchup">
       <div className="header">
