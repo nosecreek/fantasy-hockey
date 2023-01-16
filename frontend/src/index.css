@@ -152,6 +152,11 @@ h2 {
   padding-top: 1em;
 }
 
+.help h3 {
+  font-size: 1em;
+  margin: 0;
+}
+
 .helpBox {
   width: 600px;
   padding-bottom: 1em;

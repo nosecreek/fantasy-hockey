@@ -36,6 +36,8 @@ const getAvg = (cat, stat, currentWeek) => {
 }
 
 const matchupFunctions = {
+  c1,
+  c2,
   valueToColor,
   getAvg
 }
