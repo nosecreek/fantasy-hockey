@@ -35,34 +35,38 @@ const delay = (ms) => new Promise((res) => setTimeout(res, ms))
 
 app.use(express.static('build'))
 
-app.yf = new YahooFantasy(
-  APP_KEY,
-  APP_SECRET,
-  app.tokenCallback,
-  `${BACKEND_URI}auth/yahoo/callback`
-)
+const createYF = () => {
+  return new YahooFantasy(
+    APP_KEY,
+    APP_SECRET,
+    app.tokenCallback,
+    `${BACKEND_URI}auth/yahoo/callback`
+  )
+}
 
 app.get('/auth/yahoo', (req, res) => {
+  const yf = createYF()
   try {
-    app.yf.auth(res)
+    yf.auth(res)
   } catch (e) {
     console.log(e.description)
   }
 })
 
 app.get('/auth/yahoo/callback', (req, res) => {
+  const yf = createYF()
   try {
-    app.yf.authCallback(req, async (err) => {
+    yf.authCallback(req, async (err) => {
       if (err) {
         return res.redirect('/error')
       }
       await delay(100)
       res.setHeader('Set-Cookie', [
-        serialize('accessToken', app.yf.yahooUserToken, {
+        serialize('accessToken', yf.yahooUserToken, {
           path: '/',
           httpOnly: true
         }),
-        serialize('refreshToken', app.yf.yahooRefreshToken, {
+        serialize('refreshToken', yf.yahooRefreshToken, {
           path: '/',
           httpOnly: true
         }),
@@ -101,9 +105,10 @@ app.get('/auth/logout', (req, res) => {
 })
 
 app.get('/api/team', middleware.userExtractor, async (req, res) => {
+  const yf = createYF()
   try {
-    app.yf.setUserToken(req.userToken)
-    const data = await app.yf.user.game_teams('nhl')
+    yf.setUserToken(req.userToken)
+    const data = await yf.user.game_teams('nhl')
     res.json(data)
   } catch (e) {
     console.log(e.description)
@@ -112,21 +117,24 @@ app.get('/api/team', middleware.userExtractor, async (req, res) => {
 })
 
 app.post('/api/league', middleware.userExtractor, async (req, res) => {
-  app.yf.setUserToken(req.userToken)
-  const data = await app.yf.league.settings(req.body.leagueKey)
+  const yf = createYF()
+  yf.setUserToken(req.userToken)
+  const data = await yf.league.settings(req.body.leagueKey)
   res.json(data)
 })
 
 app.post('/api/matchup', middleware.userExtractor, async (req, res) => {
-  app.yf.setUserToken(req.userToken)
-  const data = await app.yf.team.matchups(req.body.teamKey)
+  const yf = createYF()
+  yf.setUserToken(req.userToken)
+  const data = await yf.team.matchups(req.body.teamKey)
   res.json(data)
 })
 
 app.post('/api/teamstats', middleware.userExtractor, async (req, res) => {
+  const yf = createYF()
   try {
-    app.yf.setUserToken(req.userToken)
-    const data = await app.yf.team.stats(req.body.teamKey)
+    yf.setUserToken(req.userToken)
+    const data = await yf.team.stats(req.body.teamKey)
     res.json(data)
   } catch (e) {
     console.log(e.description)
@@ -135,10 +143,11 @@ app.post('/api/teamstats', middleware.userExtractor, async (req, res) => {
 })
 
 app.post('/api/rosters', middleware.userExtractor, async (req, res) => {
-  app.yf.setUserToken(req.userToken)
+  const yf = createYF()
+  yf.setUserToken(req.userToken)
   try {
     console.log(req.body.teamKeys)
-    const players = await app.yf.players.teams([req.body.teamKeys])
+    const players = await yf.players.teams([req.body.teamKeys])
     const player_ids = players[0].players.map((player) => player.player_key)
     const opp_player_ids =
       players?.[1]?.players.map((player) => player.player_key) || null
@@ -146,15 +155,15 @@ app.post('/api/rosters', middleware.userExtractor, async (req, res) => {
     if (opp_player_ids) {
       try {
         ;[player_data.team, player_data.opp] = await Promise.all([
-          app.yf.players.fetch(player_ids, ['stats']),
-          app.yf.players.fetch(opp_player_ids, ['stats'])
+          yf.players.fetch(player_ids, ['stats']),
+          yf.players.fetch(opp_player_ids, ['stats'])
         ])
       } catch (e) {
         console.log(e)
       }
     } else {
       try {
-        player_data.team = await app.yf.players.fetch(player_ids, ['stats'])
+        player_data.team = await yf.players.fetch(player_ids, ['stats'])
       } catch (e) {
         console.log(e)
       }
@@ -167,9 +176,10 @@ app.post('/api/rosters', middleware.userExtractor, async (req, res) => {
 })
 
 app.post('/api/player', middleware.userExtractor, async (req, res) => {
+  const yf = createYF()
+  yf.setUserToken(req.userToken)
   try {
-    app.yf.setUserToken(req.userToken)
-    const data = await app.yf.player.stats(req.body.playerId, req.body.week)
+    const data = await yf.player.stats(req.body.playerId, req.body.week)
     res.json(data)
   } catch (e) {
     console.log(e.description)
