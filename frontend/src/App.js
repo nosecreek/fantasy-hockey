@@ -43,9 +43,7 @@ const App = () => {
         setWeek(parseInt(league.data.current_week))
         setCurrentWeek(parseInt(league.data.current_week))
         setLastMonthSchedule(schedule.data)
-      } catch (e) {
-        console.log(e)
-      }
+      } catch (e) {}
     }
 
     if (leagueKey) {
@@ -82,9 +80,7 @@ const App = () => {
           teamKey: teamKey
         })
         setMatchup(result.data)
-      } catch (e) {
-        console.log(e)
-      }
+      } catch (e) {}
     }
 
     if (teamKey) {
@@ -133,7 +129,6 @@ const App = () => {
     )
 
   try {
-    console.log(oppStats.team_key, matchup.matchups[week - 1].teams[1].team_key)
     return (
       <div>
         {!(

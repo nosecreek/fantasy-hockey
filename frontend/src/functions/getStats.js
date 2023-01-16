@@ -170,7 +170,6 @@ const getStats = async (
     getGoalies(teamRoster),
     getGoalies(oppRoster)
   ])
-  console.log(teamGoalieStats, oppGoalieStats)
 
   stats = await calculatePredicted(
     'teamPredicted',
