@@ -1,5 +1,6 @@
 body {
   background: #333;
+  font-size: 16px;
 }
 
 .login {
@@ -76,14 +77,16 @@ th {
   vertical-align: middle;
 }
 
-td {
+#root table td {
   vertical-align: middle;
   font-weight: bold;
+  color: #000;
 }
+
 
 .avg {
   font-weight: 400;
-  color: #555;
+  color: #000;
   display: block;
 }
 
@@ -149,12 +152,17 @@ h2 {
   padding-top: 1em;
 }
 
+.help h3 {
+  font-size: 1em;
+  margin: 0;
+}
+
 .helpBox {
   width: 600px;
   padding-bottom: 1em;
 }
 
-.swatchTable, .swatchTable * {
+#root .swatchTable, #root .swatchTable * {
   background: none;
   color: #f2f2f2;
   border: 0;
@@ -168,7 +176,7 @@ td.swatch {
   width: 50%;
 }
 
-td.swatch div {
+#root td.swatch div {
   height: 2em;
   background: linear-gradient(to right, var(--stops, transparent, transparent));
 }

@@ -68,6 +68,14 @@ const Login = ({ setTeamKey, setLeagueKey, setHelpScreen }) => {
             </a>
             .
           </p>
+          <p>
+            Update - <em>January 16, 2023</em> - Now uses a more advanced
+            algorithm to display a predicted total for each category.{' '}
+            <a href="/" onClick={(e) => displayHelp(e)}>
+              See 'help' to learn more
+            </a>
+            .
+          </p>
         </div>
       </div>
     )

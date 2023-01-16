@@ -5,36 +5,73 @@ import Login from './components/Login'
 import Loading from './components/Loading'
 import Footer from './components/Footer'
 import Help from './components/Help'
+import getStats from './functions/getStats'
 
 const App = () => {
   const [teamKey, setTeamKey] = useState(null)
   const [leagueKey, setLeagueKey] = useState(null)
   const [league, setLeague] = useState(null)
+  const [stats, setStats] = useState(null)
   const [teamStats, setTeamStats] = useState(null)
   const [oppStats, setOppStats] = useState(null)
+  const [teamRoster, setTeamRoster] = useState(null)
   const [matchup, setMatchup] = useState(null)
   const [week, setWeek] = useState(null)
   const [currentWeek, setCurrentWeek] = useState(null)
   const [helpScreen, setHelpScreen] = useState(false)
+  const [lastMonthSchedule, setLastMonthSchedule] = useState(null)
+
+  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
+    .toISOString()
+    .split('T')[0]
+  const lastMonth = new Date(new Date().setMonth(new Date().getMonth() - 1))
+    .toISOString()
+    .split('T')[0]
 
   useEffect(() => {
     const loadLeagueInfo = async () => {
       try {
-        const result = await axios.post('/api/league', {
-          leagueKey: leagueKey
-        })
-        setLeague(result.data)
-        setWeek(parseInt(result.data.current_week))
-        setCurrentWeek(parseInt(result.data.current_week))
-      } catch (e) {
-        console.log(e)
-      }
+        const [league, schedule] = await Promise.all([
+          axios.post('/api/league', {
+            leagueKey: leagueKey
+          }),
+          axios.get(
+            `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${lastMonth}&endDate=${yesterday}`
+          )
+        ])
+        setLeague(league.data)
+        setWeek(parseInt(league.data.current_week))
+        setCurrentWeek(parseInt(league.data.current_week))
+        setLastMonthSchedule(schedule.data)
+      } catch (e) {}
     }
 
     if (leagueKey) {
       loadLeagueInfo()
     }
-  }, [leagueKey])
+  }, [lastMonth, leagueKey, yesterday])
+
+  useEffect(() => {
+    //Load team stats
+    const getTeamStats = async () => {
+      const result = await axios.post('/api/teamstats', {
+        teamKey: teamKey
+      })
+      setTeamStats(result.data)
+    }
+    if (teamKey && !teamStats) getTeamStats()
+  }, [teamKey, teamStats])
+
+  useEffect(() => {
+    //Load team roster
+    const getRosters = async () => {
+      const result = await axios.post('/api/rosters', {
+        teamKeys: [teamKey]
+      })
+      setTeamRoster(result.data.team)
+    }
+    if (teamKey && !teamRoster) getRosters()
+  }, [teamKey, teamRoster])
 
   useEffect(() => {
     const loadMatchup = async () => {
@@ -43,9 +80,7 @@ const App = () => {
           teamKey: teamKey
         })
         setMatchup(result.data)
-      } catch (e) {
-        console.log(e)
-      }
+      } catch (e) {}
     }
 
     if (teamKey) {
@@ -55,28 +90,32 @@ const App = () => {
 
   useEffect(() => {
     const loadStats = async () => {
-      try {
-        const result = await axios.post('/api/teamstats', {
-          teamKey: teamKey
-        })
-        setTeamStats(result.data)
-      } catch (e) {
-        console.log(e)
-      }
-      try {
-        const result = await axios.post('/api/teamstats', {
-          teamKey: matchup.matchups[week - 1].teams[1].team_key
-        })
-        setOppStats(result.data)
-      } catch (e) {
-        console.log(e)
-      }
+      //Get Matchup Stats
+      const [stats, oppStats] = await getStats(
+        teamStats,
+        teamRoster,
+        league,
+        lastMonthSchedule,
+        matchup,
+        week
+      )
+
+      //Set State
+      setStats(stats)
+      setOppStats(oppStats)
     }
 
-    if (matchup && teamKey) {
+    if (
+      matchup &&
+      week &&
+      teamKey &&
+      league &&
+      lastMonthSchedule &&
+      teamStats &&
+      teamRoster
+    )
       loadStats()
-    }
-  }, [matchup, week, teamKey])
+  }, [lastMonthSchedule, league, matchup, teamKey, teamRoster, teamStats, week])
 
   if (helpScreen) return <Help setHelpScreen={setHelpScreen} />
 
@@ -98,11 +137,11 @@ const App = () => {
         <Matchup
           teamStats={teamStats}
           oppStats={oppStats}
-          league={league}
           week={week}
           setWeek={setWeek}
           matchup={matchup}
           currentWeek={currentWeek}
+          stats={stats}
         />
         <Footer setHelpScreen={setHelpScreen} />
       </div>

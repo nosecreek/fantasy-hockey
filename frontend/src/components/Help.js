@@ -1,5 +1,6 @@
+import { useEffect } from 'react'
 import Table from 'react-bootstrap/Table'
-import Color from 'colorjs.io'
+import matchupFunctions from '../functions/matchup'
 
 const Help = ({ setHelpScreen }) => {
   const closeHelp = (e) => {
@@ -7,11 +8,17 @@ const Help = ({ setHelpScreen }) => {
     setHelpScreen(false)
   }
 
-  const c1 = new Color('red')
-  const c2 = new Color('p3', [0, 1, 0])
-  // const range = c1.range(c2, { space: 'hsl' })
-  const steps = c1
-    .steps(c2, {
+  useEffect(() => {
+    //Scroll to the top when component is displayed
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant'
+    })
+  }, [])
+
+  const steps = matchupFunctions.c1
+    .steps(matchupFunctions.c2, {
       space: 'hsl',
       outputSpace: 'srgb',
       maxDeltaE: 3, // max deltaE between consecutive steps (optional)
@@ -67,11 +74,11 @@ const Help = ({ setHelpScreen }) => {
                   background: 'rgb(222, 248, 0)'
                 }}
               >
-                290
+                29.42
                 <br />
-                (Season Total)
+                (Predicted Total)
                 <span className="avg">
-                  29.42
+                  30.15
                   <br />
                   (Weekly Average)
                 </span>
@@ -88,11 +95,11 @@ const Help = ({ setHelpScreen }) => {
                   background: 'rgb(250, 223, 0)'
                 }}
               >
-                234
+                23.74
                 <br />
-                (Season Total)
+                (Predicted Total)
                 <span className="avg">
-                  23.74
+                  22.86
                   <br />
                   (Weekly Average)
                 </span>
@@ -107,6 +114,19 @@ const Help = ({ setHelpScreen }) => {
         </p>
 
         <Swatch />
+
+        <h3>Predicted Total</h3>
+        <p>
+          Considers each player's current roster, average stats for each player
+          on the roster, injury status, and the number of games each of those
+          players is expected to play in the selected week.
+        </p>
+        <h3>Weekly Average</h3>
+        <p>
+          Season total stats divided by the number of weeks played so far. Does
+          not consider current rosters, and is therefore likely to be less
+          accurate.
+        </p>
 
         <a href="/" onClick={(e) => closeHelp(e)}>
           Go Back

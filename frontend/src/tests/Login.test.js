@@ -56,7 +56,7 @@ describe('Login Screen', () => {
       />
     )
 
-    const helpLink = screen.getByText(/learn more/)
+    const helpLink = screen.getByText(/click here to learn more/)
     userEvent.click(helpLink)
 
     expect(setHelpScreen.mock.calls).toHaveLength(1)

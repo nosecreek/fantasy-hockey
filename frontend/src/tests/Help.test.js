@@ -9,6 +9,11 @@ const swatch =
 
 describe('Rendering the Help Screen', () => {
   const setHelpScreen = jest.fn()
+  window.scrollTo = jest.fn()
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
 
   test('help screen displays the correct content', async () => {
     render(<Help />)
@@ -18,7 +23,7 @@ describe('Rendering the Help Screen', () => {
         /This is a tool for analyzing your weekly matchups in Yahoo!/
       )
     ).toBeDefined()
-    expect(screen.getByText(/290/)).toBeDefined()
+    expect(screen.getByText(/30.15/)).toBeDefined()
     expect(screen.getByText(/23.74/)).toBeDefined()
 
     expect(screen.getByTitle('Color Gradient')).toHaveStyle(swatch)
