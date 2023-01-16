@@ -9,6 +9,7 @@ const Help = ({ setHelpScreen }) => {
   }
 
   useEffect(() => {
+    //Scroll to the top when component is displayed
     window.scrollTo({
       top: 0,
       left: 0,

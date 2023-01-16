@@ -9,6 +9,7 @@ const calculatePredicted = async (
   lastMonthSchedule
 ) => {
   for (const [i, player] of roster.entries()) {
+    //exclude injured/NA players
     if (!player.status) {
       const gamesThisWeek = schedule.dates.filter((date) => {
         return date.games.some((game) => {
@@ -127,6 +128,7 @@ const getStats = async (
     ])
   } catch (e) {}
 
+  //Capture which categories the league uses from league settings
   let stats = league.settings.stat_categories.map((cat) => ({
     id: cat.stat_id,
     name: cat.name,
@@ -142,6 +144,7 @@ const getStats = async (
     hidden: cat.is_only_display_stat || false
   }))
 
+  //Add TOI cat for goalies - use to calculate GAA
   stats.push({
     id: 28,
     name: 'TOI',
@@ -171,6 +174,7 @@ const getStats = async (
     getGoalies(oppRoster)
   ])
 
+  //Calculate team predictions
   stats = await calculatePredicted(
     'teamPredicted',
     teamRoster,
@@ -179,6 +183,8 @@ const getStats = async (
     stats,
     lastMonthSchedule
   )
+
+  //Calculate opponent predictions
   stats = await calculatePredicted(
     'oppPredicted',
     oppRoster,
