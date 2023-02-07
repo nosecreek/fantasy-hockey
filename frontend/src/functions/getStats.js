@@ -132,6 +132,7 @@ const getStats = async (
   let stats = league.settings.stat_categories.map((cat) => ({
     id: cat.stat_id,
     name: cat.name,
+    abbr: cat.abbr,
     group: cat.group,
     teamStat: teamStats.stats.find(
       (s) => parseInt(s.stat_id) === parseInt(cat.stat_id)

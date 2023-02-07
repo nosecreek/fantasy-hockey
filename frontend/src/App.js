@@ -6,6 +6,7 @@ import Loading from './components/Loading'
 import Footer from './components/Footer'
 import Help from './components/Help'
 import getStats from './functions/getStats'
+import Players from './components/Players'
 
 const App = () => {
   const [teamKey, setTeamKey] = useState(null)
@@ -20,6 +21,7 @@ const App = () => {
   const [currentWeek, setCurrentWeek] = useState(null)
   const [helpScreen, setHelpScreen] = useState(false)
   const [lastMonthSchedule, setLastMonthSchedule] = useState(null)
+  const [players, setPlayers] = useState(null)
 
   const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
     .toISOString()
@@ -131,16 +133,21 @@ const App = () => {
             stat_id: 'vorp',
             value: vorp
           })
+
+          const positions = p.eligible_positions.filter(
+            (p) => p !== 'IR+' && p !== 'Util'
+          )
+
           return {
             id: p.player_id,
             name: p.name.full,
             team: p.editorial_team_abbr,
-            positions: p.eligible_positions,
+            positions: positions,
             stats: stats
           }
         })
 
-        console.log(
+        setPlayers(
           newPlayers.sort(
             (a, b) =>
               b.stats[b.stats.length - 1].value -
@@ -199,6 +206,9 @@ const App = () => {
     )
 
   try {
+    if (new URL(document.location).searchParams.has('players'))
+      return <Players players={players} stats={stats} />
+
     return (
       <div>
         {!(
