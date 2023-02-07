@@ -186,3 +186,26 @@ app.post('/api/player', middleware.userExtractor, async (req, res) => {
     res.status(401).send('Please login')
   }
 })
+
+app.post('/api/players', middleware.userExtractor, async (req, res) => {
+  const yf = createYF()
+  yf.setUserToken(req.userToken)
+  try {
+    const promises = []
+    for (let i = 0; i < 300; i += 25) {
+      promises.push(
+        yf.players.leagues(
+          [req.body.leagueKey],
+          { sort: ['AR'], position: 'F,LW,RW,D', start: i, count: 25 },
+          ['stats']
+        )
+      )
+    }
+    const results = await Promise.all(promises)
+    const data = results.reduce((a, b) => [...a, ...b[0].players], [])
+    res.json(data)
+  } catch (e) {
+    console.log(e)
+    res.status(401).send('Please login')
+  }
+})

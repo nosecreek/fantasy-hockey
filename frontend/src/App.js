@@ -74,6 +74,7 @@ const App = () => {
   }, [teamKey, teamRoster])
 
   useEffect(() => {
+    //Load matchup information
     const loadMatchup = async () => {
       try {
         const result = await axios.post('/api/matchup', {
@@ -83,8 +84,77 @@ const App = () => {
       } catch (e) {}
     }
 
+    const loadPlayers = async () => {
+      try {
+        const result = await axios.post('/api/players', {
+          leagueKey: leagueKey
+        })
+
+        const players = result.data
+
+        const totals = {}
+        players[0].stats.stats.forEach(
+          (s) => (totals[s.stat_id] = { value: 0 })
+        )
+
+        players.forEach((p) => {
+          p.stats.stats.forEach((stat) => {
+            totals[stat.stat_id].value += parseFloat(stat.value)
+          })
+        })
+
+        let weight = 0
+        Object.keys(totals).forEach((k) => {
+          weight += totals[k].value
+        })
+        console.log(weight)
+
+        Object.keys(totals).forEach((k) => {
+          totals[k].weight = 1 / (totals[k].value / weight)
+
+          totals[k].average = totals[k].value / 300
+        })
+        console.log(totals)
+
+        const newPlayers = players.map((p) => {
+          let vorp = 0
+          const stats = p.stats.stats.map((s) => {
+            vorp +=
+              (s.value - totals[s.stat_id].average) * totals[s.stat_id].weight
+            return {
+              stat_id: s.stat_id,
+              value: s.value
+            }
+          })
+
+          stats.push({
+            stat_id: 'vorp',
+            value: vorp
+          })
+          return {
+            id: p.player_id,
+            name: p.name.full,
+            team: p.editorial_team_abbr,
+            positions: p.eligible_positions,
+            stats: stats
+          }
+        })
+
+        console.log(
+          newPlayers.sort(
+            (a, b) =>
+              b.stats[b.stats.length - 1].value -
+              a.stats[b.stats.length - 1].value
+          )
+        )
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
     if (teamKey) {
       loadMatchup()
+      loadPlayers()
     }
   }, [teamKey])
 
