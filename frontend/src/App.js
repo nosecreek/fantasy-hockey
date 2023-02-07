@@ -33,18 +33,22 @@ const App = () => {
   useEffect(() => {
     const loadLeagueInfo = async () => {
       try {
-        const [league, schedule] = await Promise.all([
+        const [league, schedule, players] = await Promise.all([
           axios.post('/api/league', {
             leagueKey: leagueKey
           }),
           axios.get(
             `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${lastMonth}&endDate=${yesterday}`
-          )
+          ),
+          await axios.post('/api/players', {
+            leagueKey: leagueKey
+          })
         ])
         setLeague(league.data)
         setWeek(parseInt(league.data.current_week))
         setCurrentWeek(parseInt(league.data.current_week))
         setLastMonthSchedule(schedule.data)
+        setPlayers(players.data)
       } catch (e) {}
     }
 
@@ -86,82 +90,8 @@ const App = () => {
       } catch (e) {}
     }
 
-    const loadPlayers = async () => {
-      try {
-        const result = await axios.post('/api/players', {
-          leagueKey: leagueKey
-        })
-
-        const players = result.data
-
-        const totals = {}
-        players[0].stats.stats.forEach(
-          (s) => (totals[s.stat_id] = { value: 0 })
-        )
-
-        players.forEach((p) => {
-          p.stats.stats.forEach((stat) => {
-            totals[stat.stat_id].value += parseFloat(stat.value)
-          })
-        })
-
-        let weight = 0
-        Object.keys(totals).forEach((k) => {
-          weight += totals[k].value
-        })
-        console.log(weight)
-
-        Object.keys(totals).forEach((k) => {
-          totals[k].weight = 1 / (totals[k].value / weight)
-
-          totals[k].average = totals[k].value / 300
-        })
-        console.log(totals)
-
-        const newPlayers = players.map((p) => {
-          let vorp = 0
-          const stats = p.stats.stats.map((s) => {
-            vorp +=
-              (s.value - totals[s.stat_id].average) * totals[s.stat_id].weight
-            return {
-              stat_id: s.stat_id,
-              value: s.value
-            }
-          })
-
-          stats.push({
-            stat_id: 'vorp',
-            value: vorp
-          })
-
-          const positions = p.eligible_positions.filter(
-            (p) => p !== 'IR+' && p !== 'Util'
-          )
-
-          return {
-            id: p.player_id,
-            name: p.name.full,
-            team: p.editorial_team_abbr,
-            positions: positions,
-            stats: stats
-          }
-        })
-
-        setPlayers(
-          newPlayers.sort(
-            (a, b) =>
-              b.stats[b.stats.length - 1].value -
-              a.stats[b.stats.length - 1].value
-          )
-        )
-      } catch (e) {
-        console.log(e)
-      }
-    }
-
     if (teamKey) {
       loadMatchup()
-      loadPlayers()
     }
   }, [teamKey])
 
