@@ -181,6 +181,18 @@ td.swatch {
   background: linear-gradient(to right, var(--stops, transparent, transparent));
 }
 
+th.stat {
+  cursor: pointer;
+}
+
+th.weight0 {
+  background: red;
+}
+
+th.weight2 {
+  background: green;
+}
+
 .footer {
   width: 100%;
   text-align: center;

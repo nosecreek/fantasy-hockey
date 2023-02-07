@@ -137,7 +137,7 @@ const App = () => {
 
   try {
     if (new URL(document.location).searchParams.has('players'))
-      return <Players players={players} stats={stats} />
+      return <Players players={players} leagueStats={stats} />
 
     return (
       <div>

@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import Table from 'react-bootstrap/Table'
 import Loading from './Loading'
 
-const Players = ({ players, stats }) => {
+const Players = ({ players, leagueStats }) => {
   const [playerList, setPlayerList] = useState(null)
+  const [stats, setStats] = useState(null)
 
   useEffect(() => {
     const calculteRankings = () => {
@@ -29,16 +30,18 @@ const Players = ({ players, stats }) => {
 
       const newPlayers = players.map((p) => {
         let vorp = 0
-        const stats = p.stats.stats.map((s) => {
+        const playerStats = p.stats.stats.map((s) => {
           vorp +=
-            (s.value - totals[s.stat_id].average) * totals[s.stat_id].weight
+            (s.value - totals[s.stat_id].average) *
+            totals[s.stat_id].weight *
+            stats.find((stat) => stat.id === parseInt(s.stat_id))?.weight
           return {
             stat_id: s.stat_id,
             value: s.value
           }
         })
 
-        stats.push({
+        playerStats.push({
           stat_id: 'vorp',
           value: vorp
         })
@@ -52,22 +55,48 @@ const Players = ({ players, stats }) => {
           name: p.name.full,
           team: p.editorial_team_abbr,
           positions: positions,
-          stats: stats
+          stats: playerStats
         }
       })
 
-      setPlayerList(
-        newPlayers.sort(
-          (a, b) =>
-            b.stats[b.stats.length - 1].value -
-            a.stats[b.stats.length - 1].value
-        )
+      newPlayers.sort(
+        (a, b) =>
+          b.stats[b.stats.length - 1].value - a.stats[b.stats.length - 1].value
       )
-    }
-    if (players) calculteRankings()
-  }, [players])
 
-  if (!players || !stats) return <Loading />
+      setPlayerList(newPlayers.map((p, i) => ({ ...p, rank: i + 1 })))
+    }
+    if (players && stats) calculteRankings()
+  }, [players, stats])
+
+  useEffect(() => {
+    if (leagueStats) {
+      const newStats = leagueStats
+        .filter((stat) => stat.group === 'offense')
+        .map((stat) => ({
+          id: stat.id,
+          name: stat.abbr,
+          weight: 1
+        }))
+      setStats(newStats)
+    }
+  }, [leagueStats])
+
+  const changeWeight = (id) => {
+    const newStat = stats.find((stat) => stat.id === id)
+    if (newStat.weight === 1) {
+      newStat.weight = 2
+    } else if (newStat.weight === 2) {
+      newStat.weight = 0
+    } else if (newStat.weight === 0) {
+      newStat.weight = 1
+    }
+
+    const newStats = stats.map((stat) => (stat.id === id ? newStat : stat))
+    setStats(newStats)
+  }
+
+  if (!playerList || !stats) return <Loading />
 
   return (
     <Table bordered hover>
@@ -77,8 +106,14 @@ const Players = ({ players, stats }) => {
           <th>Name</th>
           <th>Position</th>
           <th>Team</th>
-          {stats.slice(0, playerList[0].stats.length - 1).map((stat) => (
-            <th key={stat.id}>{stat.abbr}</th>
+          {stats.map((stat) => (
+            <th
+              key={stat.id}
+              onClick={() => changeWeight(stat.id)}
+              className={`weight${stat.weight} stat`}
+            >
+              {stat.name}
+            </th>
           ))}
           <th>VORP</th>
         </tr>
@@ -86,7 +121,7 @@ const Players = ({ players, stats }) => {
       <tbody>
         {playerList.map((player, i) => (
           <tr key={player.id}>
-            <td>{i + 1}</td>
+            <td>{player.rank}</td>
             <td>{player.name}</td>
             <td>{player.positions.toString()}</td>
             <td>{player.team}</td>
