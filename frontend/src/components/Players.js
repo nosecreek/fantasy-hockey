@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Table from 'react-bootstrap/Table'
 import Form from 'react-bootstrap/Form'
 import Loading from './Loading'
@@ -31,6 +31,10 @@ const Players = ({
   ]
   const [position, setPosition] = useState(positions[0].value)
 
+  const weights = useMemo(() => {
+    return [0, 0.5, 1, 1.75, 2.5]
+  }, [])
+
   useEffect(() => {
     const calculteRankings = () => {
       //use totals by all players to calculate a "weight" for each stat
@@ -54,15 +58,18 @@ const Players = ({
 
         totals[k].average = totals[k].value / 300
       })
-      console.log(totals)
+
       //Calculate VORP for each player
       const newPlayers = players.map((p) => {
         let vorp = 0
+
         const playerStats = p.stats.stats.map((s) => {
           vorp +=
             s.value *
             totals[s.stat_id].weight *
-            stats.find((stat) => stat.id === parseInt(s.stat_id))?.weight
+            weights?.[
+              stats.find((stat) => stat.id === parseInt(s.stat_id))?.weight
+            ]
           return {
             stat_id: s.stat_id,
             value: s.value
@@ -181,7 +188,8 @@ const Players = ({
     position,
     stats,
     teamKey,
-    weekSchedule
+    weekSchedule,
+    weights
   ])
 
   useEffect(() => {
@@ -191,7 +199,7 @@ const Players = ({
         .map((stat) => ({
           id: stat.id,
           name: stat.abbr,
-          weight: 1
+          weight: 2
         }))
       newStats.push({
         id: 'week',
@@ -250,32 +258,33 @@ const Players = ({
 
   const changeWeight = (id) => {
     const newStat = stats.find((stat) => stat.id === id)
-    if (newStat.weight === 1) {
-      newStat.weight = 2
-    } else if (newStat.weight === 2) {
-      newStat.weight = 0
-    } else if (newStat.weight === 0) {
-      newStat.weight = 1
-    }
+    newStat.weight = (newStat.weight + 1) % weights.length
     const newStats = stats.map((stat) => (stat.id === id ? newStat : stat))
     setStats(newStats)
   }
 
   const prioritizeCurrent = () => {
     const newStats = stats.map((stat) => {
-      let weight = 1
+      let weight = 2
       if (
         stat.id === 'week' ||
         stat.id === weekWeight[0].id ||
         stat.id === weekWeight[1].id
       ) {
-        weight = 2
+        weight = 4
       } else if (
         stat.id === 'next' ||
         stat.id === weekWeight[weekWeight.length - 1].id ||
         stat.id === weekWeight[weekWeight.length - 2].id
       ) {
         weight = 0
+      } else if (stat.id === weekWeight[2].id || stat.id === weekWeight[3].id) {
+        weight = 3
+      } else if (
+        stat.id === weekWeight[weekWeight.length - 3].id ||
+        stat.id === weekWeight[weekWeight.length - 4].id
+      ) {
+        weight = 1
       }
       return { ...stat, weight: weight }
     })
@@ -285,19 +294,26 @@ const Players = ({
 
   const prioritizeNext = () => {
     const newStats = stats.map((stat) => {
-      let weight = 1
+      let weight = 2
       if (
         stat.id === 'next' ||
         stat.id === nextWeight[0].id ||
         stat.id === nextWeight[1].id
       ) {
-        weight = 2
+        weight = 4
       } else if (
         stat.id === 'week' ||
         stat.id === nextWeight[nextWeight.length - 1].id ||
         stat.id === nextWeight[nextWeight.length - 2].id
       ) {
         weight = 0
+      } else if (stat.id === nextWeight[2].id || stat.id === nextWeight[3].id) {
+        weight = 3
+      } else if (
+        stat.id === nextWeight[nextWeight.length - 3].id ||
+        stat.id === nextWeight[nextWeight.length - 4].id
+      ) {
+        weight = 1
       }
       return { ...stat, weight: weight }
     })
@@ -307,7 +323,7 @@ const Players = ({
 
   const handleClear = () => {
     const newStats = stats.map((stat) => {
-      let weight = 1
+      let weight = 2
       if (stat.id === 'next' || stat.id === 'week') {
         weight = 0
       }

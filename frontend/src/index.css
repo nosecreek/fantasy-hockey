@@ -222,11 +222,23 @@ th.stat {
 }
 
 th.weight0 {
-  background: red;
+  background: rgb(100% 0% 0%);
+}
+
+th.weight1 {
+  background: rgb(250 198 0);
 }
 
 th.weight2 {
-  background: green;
+  background: transparent;
+}
+
+th.weight3 {
+  background: rgb(149 247 0);
+}
+
+th.weight4 {
+  background: rgb(0 200 45);
 }
 
 .footer {
