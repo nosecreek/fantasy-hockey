@@ -4,7 +4,13 @@ import Form from 'react-bootstrap/Form'
 import Loading from './Loading'
 import Button from 'react-bootstrap/esm/Button'
 
-const Players = ({ players, leagueStats, teamKey }) => {
+const Players = ({
+  players,
+  leagueStats,
+  teamKey,
+  weekSchedule,
+  nextSchedule
+}) => {
   const [playerList, setPlayerList] = useState(null)
   const [stats, setStats] = useState(null)
   const [freeAgents, setFreeAgents] = useState(true)
@@ -46,7 +52,7 @@ const Players = ({ players, leagueStats, teamKey }) => {
         let vorp = 0
         const playerStats = p.stats.stats.map((s) => {
           vorp +=
-            (s.value - totals[s.stat_id].average) *
+            s.value *
             totals[s.stat_id].weight *
             stats.find((stat) => stat.id === parseInt(s.stat_id))?.weight
           return {
@@ -54,6 +60,45 @@ const Players = ({ players, leagueStats, teamKey }) => {
             value: s.value
           }
         })
+
+        const gamesThisWeek = weekSchedule.dates.filter((date) => {
+          return date.games.some((game) => {
+            return (
+              game.teams.away.team.name.replace('é', 'e') ===
+                p.editorial_team_full_name ||
+              game.teams.home.team.name.replace('é', 'e') ===
+                p.editorial_team_full_name
+            )
+          })
+        }).length
+        playerStats.push({
+          stat_id: 'week',
+          value: gamesThisWeek
+        })
+
+        const gamesNextWeek = nextSchedule.dates.filter((date) => {
+          return date.games.some((game) => {
+            return (
+              game.teams.away.team.name.replace('é', 'e') ===
+                p.editorial_team_full_name ||
+              game.teams.home.team.name.replace('é', 'e') ===
+                p.editorial_team_full_name
+            )
+          })
+        }).length
+        playerStats.push({
+          stat_id: 'next',
+          value: gamesNextWeek
+        })
+
+        vorp +=
+          vorp *
+          (gamesThisWeek - 1) *
+          stats.find((stat) => stat.id === 'week')?.weight
+        vorp +=
+          vorp *
+          (gamesNextWeek - 1) *
+          stats.find((stat) => stat.id === 'next')?.weight
 
         playerStats.push({
           stat_id: 'vorp',
@@ -117,7 +162,16 @@ const Players = ({ players, leagueStats, teamKey }) => {
       setPlayerList(rankedPlayers)
     }
     if (players && stats) calculteRankings()
-  }, [freeAgents, myTeam, players, position, stats, teamKey])
+  }, [
+    freeAgents,
+    myTeam,
+    nextSchedule,
+    players,
+    position,
+    stats,
+    teamKey,
+    weekSchedule
+  ])
 
   useEffect(() => {
     if (leagueStats) {
@@ -128,6 +182,16 @@ const Players = ({ players, leagueStats, teamKey }) => {
           name: stat.abbr,
           weight: 1
         }))
+      newStats.push({
+        id: 'week',
+        name: 'WEEK',
+        weight: 0
+      })
+      newStats.push({
+        id: 'next',
+        name: 'NEXT',
+        weight: 0
+      })
       setStats(newStats)
     }
   }, [leagueStats])
@@ -184,7 +248,7 @@ const Players = ({ players, leagueStats, teamKey }) => {
           </Form.Group>
         </div>
         <h4>Optimize For</h4>
-        <div class="filters">
+        <div className="filters">
           <Button variant="outline-primary" size="sm">
             Current Matchup
           </Button>

@@ -14,8 +14,10 @@ const calculatePredicted = async (
       const gamesThisWeek = schedule.dates.filter((date) => {
         return date.games.some((game) => {
           return (
-            game.teams.away.team.name === player.editorial_team_full_name ||
-            game.teams.home.team.name === player.editorial_team_full_name
+            game.teams.away.team.name.replace('é', 'e') ===
+              player.editorial_team_full_name ||
+            game.teams.home.team.name.replace('é', 'e') ===
+              player.editorial_team_full_name
           )
         })
       }).length
@@ -90,7 +92,10 @@ const getStats = async (
   league,
   lastMonthSchedule,
   matchup,
-  week
+  week,
+  currentWeek,
+  weekSchedule,
+  nextSchedule
 ) => {
   //Load opponent stats
   const getOppStats = async () => {
@@ -110,12 +115,18 @@ const getStats = async (
 
   //Load nhl schedule
   const getSchedule = async () => {
-    const result = await axios.get(
-      `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${
-        matchup.matchups[week - 1].week_start
-      }&endDate=${matchup.matchups[week - 1].week_end}`
-    )
-    return result.data
+    if (week === currentWeek) {
+      return weekSchedule
+    } else if (week === currentWeek + 1) {
+      return nextSchedule
+    } else {
+      const result = await axios.get(
+        `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${
+          matchup.matchups[week - 1].week_start
+        }&endDate=${matchup.matchups[week - 1].week_end}`
+      )
+      return result.data
+    }
   }
 
   //Resolve promises

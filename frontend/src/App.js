@@ -21,10 +21,15 @@ const App = () => {
   const [matchup, setMatchup] = useState(null)
   const [week, setWeek] = useState(null)
   const [currentWeek, setCurrentWeek] = useState(null)
+  const [weekSchedule, setWeekSchedule] = useState(null)
+  const [nextSchedule, setNextSchedule] = useState(null)
   const [helpScreen, setHelpScreen] = useState(false)
   const [lastMonthSchedule, setLastMonthSchedule] = useState(null)
   const [players, setPlayers] = useState(null)
 
+  const today = new Date(new Date().setDate(new Date().getDate()))
+    .toISOString()
+    .split('T')[0]
   const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
     .toISOString()
     .split('T')[0]
@@ -62,16 +67,28 @@ const App = () => {
   useEffect(() => {
     //Load team stats
     const getTeamStats = async () => {
-      const result = await axios.post('/api/teamstats', {
-        teamKey: teamKey
-      })
-      setTeamStats(result.data)
+      const [stats, weekSchedule, nextSchedule] = await Promise.all([
+        axios.post('/api/teamstats', {
+          teamKey: teamKey
+        }),
+        axios.get(
+          `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${today}&endDate=${
+            matchup.matchups[currentWeek - 1].week_end
+          }`
+        ),
+        axios.get(
+          `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${matchup.matchups[currentWeek].week_start}&endDate=${matchup.matchups[currentWeek].week_end}`
+        )
+      ])
+      setTeamStats(stats.data)
+      setWeekSchedule(weekSchedule.data)
+      setNextSchedule(nextSchedule.data)
     }
-    if (teamKey && !teamStats) getTeamStats()
-  }, [teamKey, teamStats])
+    if (teamKey && matchup && currentWeek && !teamStats) getTeamStats()
+  }, [currentWeek, matchup, teamKey, teamStats, today])
 
   useEffect(() => {
-    //Load team roster
+    //Load team roster and nhl schedule for this week/next week
     const getRosters = async () => {
       const result = await axios.post('/api/rosters', {
         teamKeys: [teamKey]
@@ -106,7 +123,10 @@ const App = () => {
         league,
         lastMonthSchedule,
         matchup,
-        week
+        week,
+        currentWeek,
+        weekSchedule,
+        nextSchedule
       )
 
       //Set State
@@ -121,10 +141,24 @@ const App = () => {
       league &&
       lastMonthSchedule &&
       teamStats &&
-      teamRoster
+      teamRoster &&
+      currentWeek &&
+      weekSchedule &&
+      nextSchedule
     )
       loadStats()
-  }, [lastMonthSchedule, league, matchup, teamKey, teamRoster, teamStats, week])
+  }, [
+    currentWeek,
+    lastMonthSchedule,
+    league,
+    matchup,
+    nextSchedule,
+    teamKey,
+    teamRoster,
+    teamStats,
+    week,
+    weekSchedule
+  ])
 
   if (helpScreen) return <Help setHelpScreen={setHelpScreen} />
 
@@ -158,7 +192,13 @@ const App = () => {
           </div>
         </Tab>
         <Tab eventKey="players" title="Players">
-          <Players players={players} leagueStats={stats} teamKey={teamKey} />
+          <Players
+            players={players}
+            leagueStats={stats}
+            teamKey={teamKey}
+            weekSchedule={weekSchedule}
+            nextSchedule={nextSchedule}
+          />
         </Tab>
       </Tabs>
     )
