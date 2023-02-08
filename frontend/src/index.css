@@ -3,6 +3,14 @@ body {
   font-size: 16px;
 }
 
+.tab-menu {
+  background: #f2f2f2;
+}
+
+.tab-menu button {
+  font-weight: 700;
+}
+
 .login {
   display: flex;
   align-items: center;
@@ -90,7 +98,7 @@ th {
   display: block;
 }
 
-h2 {
+h2, h4 {
   text-align: center;
 }
 
@@ -183,11 +191,18 @@ td.swatch {
 
 .player-filters {
   background: #f2f2f2;
+}
+
+.filters {
   display: flex;
   justify-content: center;
 }
 
-.player-filters>div {
+.filters button {
+  margin: 1rem;
+}
+
+.filters>div {
   margin: 1rem;
   display: flex;
   align-items: center;

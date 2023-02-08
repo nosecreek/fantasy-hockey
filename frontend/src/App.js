@@ -7,6 +7,8 @@ import Footer from './components/Footer'
 import Help from './components/Help'
 import getStats from './functions/getStats'
 import Players from './components/Players'
+import Tab from 'react-bootstrap/Tab'
+import Tabs from 'react-bootstrap/Tabs'
 
 const App = () => {
   const [teamKey, setTeamKey] = useState(null)
@@ -136,25 +138,29 @@ const App = () => {
     )
 
   try {
-    if (new URL(document.location).searchParams.has('players'))
-      return <Players players={players} leagueStats={stats} teamKey={teamKey} />
-
     return (
-      <div>
-        {!(
-          oppStats.team_key === matchup.matchups[week - 1].teams[1].team_key
-        ) && <Loading />}
-        <Matchup
-          teamStats={teamStats}
-          oppStats={oppStats}
-          week={week}
-          setWeek={setWeek}
-          matchup={matchup}
-          currentWeek={currentWeek}
-          stats={stats}
-        />
-        <Footer setHelpScreen={setHelpScreen} />
-      </div>
+      <Tabs justify defaultActiveKey="matchup" className="tab-menu">
+        <Tab eventKey="matchup" title="Matchups">
+          <div>
+            {!(
+              oppStats.team_key === matchup.matchups[week - 1].teams[1].team_key
+            ) && <Loading />}
+            <Matchup
+              teamStats={teamStats}
+              oppStats={oppStats}
+              week={week}
+              setWeek={setWeek}
+              matchup={matchup}
+              currentWeek={currentWeek}
+              stats={stats}
+            />
+            <Footer setHelpScreen={setHelpScreen} />
+          </div>
+        </Tab>
+        <Tab eventKey="players" title="Players">
+          <Players players={players} leagueStats={stats} teamKey={teamKey} />
+        </Tab>
+      </Tabs>
     )
   } catch (e) {
     return <Loading />

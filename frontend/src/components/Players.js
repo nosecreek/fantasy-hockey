@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Table from 'react-bootstrap/Table'
 import Form from 'react-bootstrap/Form'
 import Loading from './Loading'
+import Button from 'react-bootstrap/esm/Button'
 
 const Players = ({ players, leagueStats, teamKey }) => {
   const [playerList, setPlayerList] = useState(null)
@@ -150,35 +151,50 @@ const Players = ({ players, leagueStats, teamKey }) => {
   return (
     <div>
       <Form className="player-filters">
-        <Form.Group>
-          <Form.Check
-            type="checkbox"
-            label="Free Agents"
-            checked={freeAgents}
-            onChange={({ target }) => setFreeAgents(target.checked)}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Check
-            type="checkbox"
-            label="My Team"
-            checked={myTeam}
-            onChange={({ target }) => setMyTeam(target.checked)}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Select
-            onChange={(e) => setPosition(e.target.value)}
-            value={position}
-            style={{ width: 'auto', height: 'auto' }}
-          >
-            {positions.map((p, i) => (
-              <option value={p.value} key={p.name}>
-                {p.name}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
+        <h4>Filters</h4>
+        <div className="filters">
+          <Form.Group>
+            <Form.Check
+              type="checkbox"
+              label="Free Agents"
+              checked={freeAgents}
+              onChange={({ target }) => setFreeAgents(target.checked)}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Check
+              type="checkbox"
+              label="My Team"
+              checked={myTeam}
+              onChange={({ target }) => setMyTeam(target.checked)}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Select
+              onChange={(e) => setPosition(e.target.value)}
+              value={position}
+              style={{ width: 'auto', height: 'auto' }}
+            >
+              {positions.map((p, i) => (
+                <option value={p.value} key={p.name}>
+                  {p.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </div>
+        <h4>Optimize For</h4>
+        <div class="filters">
+          <Button variant="outline-primary" size="sm">
+            Current Matchup
+          </Button>
+          <Button variant="outline-primary" size="sm">
+            Next Matchup
+          </Button>
+          <Button variant="outline-primary" size="sm">
+            Clear All
+          </Button>
+        </div>
       </Form>
       <Table bordered hover className="player-table">
         <thead>
