@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import Table from 'react-bootstrap/Table'
 import matchupFunctions from '../functions/matchup'
 
-const Help = ({ setHelpScreen }) => {
+const Help = ({ setHelpScreen, helpScreen }) => {
   const closeHelp = (e) => {
     e.preventDefault()
     setHelpScreen(false)
@@ -128,9 +128,11 @@ const Help = ({ setHelpScreen }) => {
           accurate.
         </p>
 
-        <a href="/" onClick={(e) => closeHelp(e)}>
-          Go Back
-        </a>
+        {helpScreen && (
+          <a href="/" onClick={(e) => closeHelp(e)}>
+            Go Back
+          </a>
+        )}
       </div>
     </div>
   )

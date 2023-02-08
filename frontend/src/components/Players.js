@@ -411,7 +411,7 @@ const Players = ({
                 {stat.name}
               </th>
             ))}
-            <th>VORP</th>
+            <th>VAL</th>
           </tr>
         </thead>
         <tbody>

@@ -226,7 +226,8 @@ const App = () => {
     weekSchedule
   ])
 
-  if (helpScreen) return <Help setHelpScreen={setHelpScreen} />
+  if (helpScreen)
+    return <Help setHelpScreen={setHelpScreen} helpScreen={true} />
 
   if (!teamKey)
     return (
@@ -239,36 +240,42 @@ const App = () => {
 
   try {
     return (
-      <Tabs justify defaultActiveKey="matchup" className="tab-menu">
-        <Tab eventKey="matchup" title="Matchups">
-          <div>
-            {!(
-              oppStats.team_key === matchup.matchups[week - 1].teams[1].team_key
-            ) && <Loading />}
-            <Matchup
-              teamStats={teamStats}
-              oppStats={oppStats}
-              week={week}
-              setWeek={setWeek}
-              matchup={matchup}
-              currentWeek={currentWeek}
-              stats={stats}
+      <>
+        <Tabs justify defaultActiveKey="matchup" className="tab-menu">
+          <Tab eventKey="matchup" title="Matchups">
+            <div>
+              {!(
+                oppStats.team_key ===
+                matchup.matchups[week - 1].teams[1].team_key
+              ) && <Loading />}
+              <Matchup
+                teamStats={teamStats}
+                oppStats={oppStats}
+                week={week}
+                setWeek={setWeek}
+                matchup={matchup}
+                currentWeek={currentWeek}
+                stats={stats}
+              />
+            </div>
+          </Tab>
+          <Tab eventKey="players" title="Players">
+            <Players
+              players={players}
+              leagueStats={stats}
+              teamKey={teamKey}
+              weekSchedule={weekSchedule}
+              nextSchedule={nextSchedule}
+              weekStats={weekStats}
+              nextStats={nextStats}
             />
-            <Footer setHelpScreen={setHelpScreen} />
-          </div>
-        </Tab>
-        <Tab eventKey="players" title="Players">
-          <Players
-            players={players}
-            leagueStats={stats}
-            teamKey={teamKey}
-            weekSchedule={weekSchedule}
-            nextSchedule={nextSchedule}
-            weekStats={weekStats}
-            nextStats={nextStats}
-          />
-        </Tab>
-      </Tabs>
+          </Tab>
+          <Tab eventKey="help" title="Help">
+            <Help helpScreen={false} />
+          </Tab>
+        </Tabs>
+        <Footer />
+      </>
     )
   } catch (e) {
     return <Loading />
