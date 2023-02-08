@@ -197,7 +197,7 @@ app.post('/api/players', middleware.userExtractor, async (req, res) => {
         yf.players.leagues(
           [req.body.leagueKey],
           { sort: ['AR'], position: 'F,LW,RW,D', start: i, count: 25 },
-          ['stats']
+          ['stats', 'ownership']
         )
       )
     }

@@ -1,10 +1,23 @@
 import { useEffect, useState } from 'react'
 import Table from 'react-bootstrap/Table'
+import Form from 'react-bootstrap/Form'
 import Loading from './Loading'
 
-const Players = ({ players, leagueStats }) => {
+const Players = ({ players, leagueStats, teamKey }) => {
   const [playerList, setPlayerList] = useState(null)
   const [stats, setStats] = useState(null)
+  const [freeAgents, setFreeAgents] = useState(true)
+  const [myTeam, setMyTeam] = useState(false)
+
+  const positions = [
+    { name: 'ALL', value: 'ALL' },
+    { name: 'C', value: 'C' },
+    { name: 'RW', value: 'RW' },
+    { name: 'LW', value: 'LW' },
+    { name: 'F', value: 'F' },
+    { name: 'D', value: 'D' }
+  ]
+  const [position, setPosition] = useState(positions[0].value)
 
   useEffect(() => {
     const calculteRankings = () => {
@@ -55,7 +68,8 @@ const Players = ({ players, leagueStats }) => {
           name: p.name.full,
           team: p.editorial_team_abbr,
           positions: positions,
-          stats: playerStats
+          stats: playerStats,
+          ownership: p.ownership
         }
       })
 
@@ -64,10 +78,45 @@ const Players = ({ players, leagueStats }) => {
           b.stats[b.stats.length - 1].value - a.stats[b.stats.length - 1].value
       )
 
-      setPlayerList(newPlayers.map((p, i) => ({ ...p, rank: i + 1 })))
+      let rankedPlayers = newPlayers.map((p, i) => ({ ...p, rank: i + 1 }))
+
+      if (freeAgents) {
+        if (!myTeam) {
+          rankedPlayers = rankedPlayers.filter(
+            (p) => p.ownership.ownership_type === 'freeagents'
+          )
+        } else {
+          rankedPlayers = rankedPlayers.filter(
+            (p) =>
+              p.ownership.ownership_type === 'freeagents' ||
+              p.ownership?.owner_team_key === teamKey
+          )
+        }
+      } else {
+        if (myTeam) {
+          rankedPlayers = rankedPlayers.filter(
+            (p) => p.ownership?.owner_team_key === teamKey
+          )
+        }
+      }
+
+      if (position === 'F') {
+        rankedPlayers = rankedPlayers.filter(
+          (p) =>
+            p.positions.includes('LW') ||
+            p.positions.includes('C') ||
+            p.positions.includes('RW')
+        )
+      } else if (position !== 'ALL') {
+        rankedPlayers = rankedPlayers.filter((p) =>
+          p.positions.includes(position)
+        )
+      }
+
+      setPlayerList(rankedPlayers)
     }
     if (players && stats) calculteRankings()
-  }, [players, stats])
+  }, [freeAgents, myTeam, players, position, stats, teamKey])
 
   useEffect(() => {
     if (leagueStats) {
@@ -99,39 +148,77 @@ const Players = ({ players, leagueStats }) => {
   if (!playerList || !stats) return <Loading />
 
   return (
-    <Table bordered hover>
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Name</th>
-          <th>Position</th>
-          <th>Team</th>
-          {stats.map((stat) => (
-            <th
-              key={stat.id}
-              onClick={() => changeWeight(stat.id)}
-              className={`weight${stat.weight} stat`}
-            >
-              {stat.name}
-            </th>
-          ))}
-          <th>VORP</th>
-        </tr>
-      </thead>
-      <tbody>
-        {playerList.map((player, i) => (
-          <tr key={player.id}>
-            <td>{player.rank}</td>
-            <td>{player.name}</td>
-            <td>{player.positions.toString()}</td>
-            <td>{player.team}</td>
-            {player.stats.map((stat) => (
-              <td key={stat.stat_id}>{parseFloat(stat.value).toFixed(0)}</td>
+    <div>
+      <Form className="player-filters">
+        <Form.Group>
+          <Form.Check
+            type="checkbox"
+            label="Free Agents"
+            checked={freeAgents}
+            onChange={({ target }) => setFreeAgents(target.checked)}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Check
+            type="checkbox"
+            label="My Team"
+            checked={myTeam}
+            onChange={({ target }) => setMyTeam(target.checked)}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Select
+            onChange={(e) => setPosition(e.target.value)}
+            value={position}
+            style={{ width: 'auto', height: 'auto' }}
+          >
+            {positions.map((p, i) => (
+              <option value={p.value} key={p.name}>
+                {p.name}
+              </option>
             ))}
+          </Form.Select>
+        </Form.Group>
+      </Form>
+      <Table bordered hover className="player-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Team</th>
+            {stats.map((stat) => (
+              <th
+                key={stat.id}
+                onClick={() => changeWeight(stat.id)}
+                className={`weight${stat.weight} stat`}
+              >
+                {stat.name}
+              </th>
+            ))}
+            <th>VORP</th>
           </tr>
-        ))}
-      </tbody>
-    </Table>
+        </thead>
+        <tbody>
+          {playerList.map((player, i) => (
+            <tr
+              key={player.id}
+              className={
+                player.ownership?.owner_team_key === teamKey ? 'my-team' : ''
+              }
+            >
+              <td>{player.rank}</td>
+              <td>{player.name}</td>
+              <td>{player.positions.toString()}</td>
+              <td>{player.team}</td>
+              {player.stats.map((stat) => (
+                <td key={stat.stat_id}>{parseFloat(stat.value).toFixed(0)}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
   )
 }
 

@@ -181,6 +181,27 @@ td.swatch {
   background: linear-gradient(to right, var(--stops, transparent, transparent));
 }
 
+.player-filters {
+  background: #f2f2f2;
+  display: flex;
+  justify-content: center;
+}
+
+.player-filters>div {
+  margin: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+#root table.player-table td {
+  font-weight: 400;
+}
+
+.my-team {
+  background: #ddd;
+  border-color: #bcbcbc;
+}
+
 th.stat {
   cursor: pointer;
 }
