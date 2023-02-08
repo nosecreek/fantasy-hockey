@@ -49,11 +49,12 @@ const Players = ({
       })
 
       Object.keys(totals).forEach((k) => {
-        totals[k].weight = 1 / (totals[k].value / weight)
+        totals[k].weight =
+          1 / (totals[k].value / weight) + players[0].stats.stats.length * 1
 
         totals[k].average = totals[k].value / 300
       })
-
+      console.log(totals)
       //Calculate VORP for each player
       const newPlayers = players.map((p) => {
         let vorp = 0
@@ -261,7 +262,6 @@ const Players = ({
   }
 
   const prioritizeCurrent = () => {
-    console.log(weekWeight)
     const newStats = stats.map((stat) => {
       let weight = 1
       if (
@@ -284,7 +284,6 @@ const Players = ({
   }
 
   const prioritizeNext = () => {
-    console.log(nextWeight)
     const newStats = stats.map((stat) => {
       let weight = 1
       if (
