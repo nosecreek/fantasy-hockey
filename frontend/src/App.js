@@ -15,6 +15,8 @@ const App = () => {
   const [leagueKey, setLeagueKey] = useState(null)
   const [league, setLeague] = useState(null)
   const [stats, setStats] = useState(null)
+  const [weekStats, setWeekStats] = useState(null)
+  const [nextStats, setNextStats] = useState(null)
   const [teamStats, setTeamStats] = useState(null)
   const [oppStats, setOppStats] = useState(null)
   const [teamRoster, setTeamRoster] = useState(null)
@@ -126,7 +128,9 @@ const App = () => {
         week,
         currentWeek,
         weekSchedule,
-        nextSchedule
+        nextSchedule,
+        weekStats,
+        nextStats
       )
 
       //Set State
@@ -144,9 +148,72 @@ const App = () => {
       teamRoster &&
       currentWeek &&
       weekSchedule &&
-      nextSchedule
+      nextSchedule &&
+      weekStats &&
+      nextStats
     )
       loadStats()
+  }, [
+    currentWeek,
+    lastMonthSchedule,
+    league,
+    matchup,
+    nextSchedule,
+    nextStats,
+    teamKey,
+    teamRoster,
+    teamStats,
+    week,
+    weekSchedule,
+    weekStats
+  ])
+
+  useEffect(() => {
+    const loadWeekNextStats = async () => {
+      try {
+        //Get Current and Next Matchup Stats
+        const [weekStats, nextStats] = await Promise.all([
+          getStats(
+            teamStats,
+            teamRoster,
+            league,
+            lastMonthSchedule,
+            matchup,
+            currentWeek,
+            currentWeek,
+            weekSchedule,
+            nextSchedule
+          ),
+          getStats(
+            teamStats,
+            teamRoster,
+            league,
+            lastMonthSchedule,
+            matchup,
+            currentWeek,
+            currentWeek + 1,
+            weekSchedule,
+            nextSchedule
+          )
+        ])
+        //Set State
+        setWeekStats(weekStats[0])
+        setNextStats(nextStats[0])
+      } catch (e) {}
+    }
+
+    if (
+      matchup &&
+      teamKey &&
+      league &&
+      lastMonthSchedule &&
+      teamStats &&
+      teamRoster &&
+      currentWeek &&
+      weekSchedule &&
+      nextSchedule
+    )
+      loadWeekNextStats()
   }, [
     currentWeek,
     lastMonthSchedule,
@@ -156,7 +223,6 @@ const App = () => {
     teamKey,
     teamRoster,
     teamStats,
-    week,
     weekSchedule
   ])
 
@@ -198,6 +264,8 @@ const App = () => {
             teamKey={teamKey}
             weekSchedule={weekSchedule}
             nextSchedule={nextSchedule}
+            weekStats={weekStats}
+            nextStats={nextStats}
           />
         </Tab>
       </Tabs>

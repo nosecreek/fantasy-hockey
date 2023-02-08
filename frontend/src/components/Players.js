@@ -3,18 +3,23 @@ import Table from 'react-bootstrap/Table'
 import Form from 'react-bootstrap/Form'
 import Loading from './Loading'
 import Button from 'react-bootstrap/esm/Button'
+import matchupFunctions from '../functions/matchup'
 
 const Players = ({
   players,
   leagueStats,
   teamKey,
   weekSchedule,
-  nextSchedule
+  nextSchedule,
+  weekStats,
+  nextStats
 }) => {
   const [playerList, setPlayerList] = useState(null)
   const [stats, setStats] = useState(null)
   const [freeAgents, setFreeAgents] = useState(true)
   const [myTeam, setMyTeam] = useState(false)
+  const [weekWeight, setWeekWeight] = useState(null)
+  const [nextWeight, setNextWeight] = useState(null)
 
   const positions = [
     { name: 'ALL', value: 'ALL' },
@@ -28,6 +33,7 @@ const Players = ({
 
   useEffect(() => {
     const calculteRankings = () => {
+      //use totals by all players to calculate a "weight" for each stat
       const totals = {}
       players[0].stats.stats.forEach((s) => (totals[s.stat_id] = { value: 0 }))
 
@@ -48,6 +54,7 @@ const Players = ({
         totals[k].average = totals[k].value / 300
       })
 
+      //Calculate VORP for each player
       const newPlayers = players.map((p) => {
         let vorp = 0
         const playerStats = p.stats.stats.map((s) => {
@@ -119,13 +126,16 @@ const Players = ({
         }
       })
 
+      //Sort players by VORP
       newPlayers.sort(
         (a, b) =>
           b.stats[b.stats.length - 1].value - a.stats[b.stats.length - 1].value
       )
 
+      //Give a Rank to each player
       let rankedPlayers = newPlayers.map((p, i) => ({ ...p, rank: i + 1 }))
 
+      //Filters
       if (freeAgents) {
         if (!myTeam) {
           rankedPlayers = rankedPlayers.filter(
@@ -196,6 +206,47 @@ const Players = ({
     }
   }, [leagueStats])
 
+  useEffect(() => {
+    const weighStats = () => {
+      const weightedWeek = weekStats
+        .filter((stat) => stat.group === 'offense')
+        .map((stat) => ({
+          id: stat.id,
+          value: Math.abs(
+            0.5 -
+              matchupFunctions.valueToColor(
+                stat.teamPredicted,
+                stat.oppPredicted,
+                stat.id,
+                true
+              )
+          )
+        }))
+        .sort((a, b) => a.value - b.value)
+
+      const weightedNext = nextStats
+        .filter((stat) => stat.group === 'offense')
+        .map((stat) => ({
+          id: stat.id,
+          value: Math.abs(
+            0.5 -
+              matchupFunctions.valueToColor(
+                stat.teamPredicted,
+                stat.oppPredicted,
+                stat.id,
+                true
+              )
+          )
+        }))
+        .sort((a, b) => a.value - b.value)
+
+      setWeekWeight(weightedWeek)
+      setNextWeight(weightedNext)
+    }
+
+    if (nextStats && weekStats) weighStats()
+  }, [nextStats, weekStats])
+
   const changeWeight = (id) => {
     const newStat = stats.find((stat) => stat.id === id)
     if (newStat.weight === 1) {
@@ -205,8 +256,65 @@ const Players = ({
     } else if (newStat.weight === 0) {
       newStat.weight = 1
     }
-
     const newStats = stats.map((stat) => (stat.id === id ? newStat : stat))
+    setStats(newStats)
+  }
+
+  const prioritizeCurrent = () => {
+    console.log(weekWeight)
+    const newStats = stats.map((stat) => {
+      let weight = 1
+      if (
+        stat.id === 'week' ||
+        stat.id === weekWeight[0].id ||
+        stat.id === weekWeight[1].id
+      ) {
+        weight = 2
+      } else if (
+        stat.id === 'next' ||
+        stat.id === weekWeight[weekWeight.length - 1].id ||
+        stat.id === weekWeight[weekWeight.length - 2].id
+      ) {
+        weight = 0
+      }
+      return { ...stat, weight: weight }
+    })
+
+    setStats(newStats)
+  }
+
+  const prioritizeNext = () => {
+    console.log(nextWeight)
+    const newStats = stats.map((stat) => {
+      let weight = 1
+      if (
+        stat.id === 'next' ||
+        stat.id === nextWeight[0].id ||
+        stat.id === nextWeight[1].id
+      ) {
+        weight = 2
+      } else if (
+        stat.id === 'week' ||
+        stat.id === nextWeight[nextWeight.length - 1].id ||
+        stat.id === nextWeight[nextWeight.length - 2].id
+      ) {
+        weight = 0
+      }
+      return { ...stat, weight: weight }
+    })
+
+    setStats(newStats)
+  }
+
+  const handleClear = () => {
+    const newStats = stats.map((stat) => {
+      let weight = 1
+      if (stat.id === 'next' || stat.id === 'week') {
+        weight = 0
+      }
+      return { ...stat, weight: weight }
+    })
+
     setStats(newStats)
   }
 
@@ -249,13 +357,25 @@ const Players = ({
         </div>
         <h4>Optimize For</h4>
         <div className="filters">
-          <Button variant="outline-primary" size="sm">
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={() => prioritizeCurrent()}
+          >
             Current Matchup
           </Button>
-          <Button variant="outline-primary" size="sm">
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={() => prioritizeNext()}
+          >
             Next Matchup
           </Button>
-          <Button variant="outline-primary" size="sm">
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={() => handleClear()}
+          >
             Clear All
           </Button>
         </div>

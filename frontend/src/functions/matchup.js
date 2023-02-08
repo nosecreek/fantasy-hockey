@@ -4,7 +4,7 @@ const c1 = new Color('red')
 const c2 = new Color('p3', [0, 1, 0])
 const range = c1.range(c2, { space: 'hsl' })
 
-const valueToColor = (stat, other, id) => {
+const valueToColor = (stat, other, id, number = false) => {
   let x = parseFloat(stat) / (parseFloat(stat) + parseFloat(other))
 
   //custom calculation for plus/minus
@@ -22,6 +22,8 @@ const valueToColor = (stat, other, id) => {
   }
 
   x = id === 23 ? 1 - x : x //switch colors for GAA
+
+  if (number) return x //return a number (not a color) if number is true
 
   x *= 0.915 //offset to set equal stats to yellow
 

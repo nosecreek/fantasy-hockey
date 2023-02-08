@@ -95,7 +95,9 @@ const getStats = async (
   week,
   currentWeek,
   weekSchedule,
-  nextSchedule
+  nextSchedule,
+  weekStats,
+  nextStats
 ) => {
   //Load opponent stats
   const getOppStats = async () => {
@@ -103,6 +105,16 @@ const getStats = async (
       teamKey: matchup.matchups[week - 1].teams[1].team_key
     })
     return result.data
+  }
+
+  //If current or next week, use precalculated stats
+  if (
+    weekStats &&
+    nextStats &&
+    (week === currentWeek || week === currentWeek + 1)
+  ) {
+    const oppStats = await getOppStats()
+    return week === currentWeek ? [weekStats, oppStats] : [nextStats, oppStats]
   }
 
   //Load opponent roster
