@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Table from 'react-bootstrap/Table'
 import Form from 'react-bootstrap/Form'
 import Loading from './Loading'
@@ -398,10 +398,10 @@ const Players = ({
       <Table bordered hover className="player-table">
         <thead>
           <tr>
-            <th>Rank</th>
-            <th>Name</th>
-            <th>Position</th>
-            <th>Team</th>
+            <th className="desktop">Rank</th>
+            <th className="desktop">Name</th>
+            <th className="desktop">Position</th>
+            <th className="desktop">Team</th>
             {stats.map((stat) => (
               <th
                 key={stat.id}
@@ -416,20 +416,36 @@ const Players = ({
         </thead>
         <tbody>
           {playerList.map((player, i) => (
-            <tr
-              key={player.id}
-              className={
-                player.ownership?.owner_team_key === teamKey ? 'my-team' : ''
-              }
-            >
-              <td>{player.rank}</td>
-              <td>{player.name}</td>
-              <td>{player.positions.toString()}</td>
-              <td>{player.team}</td>
-              {player.stats.map((stat) => (
-                <td key={stat.stat_id}>{parseFloat(stat.value).toFixed(0)}</td>
-              ))}
-            </tr>
+            <React.Fragment key={player.id}>
+              <tr
+                className={
+                  'mobile ' +
+                  (player.ownership?.owner_team_key === teamKey
+                    ? 'my-team'
+                    : '')
+                }
+              >
+                <td colspan="100%">
+                  Rank {player.rank} - <strong>{player.name}</strong> -{' '}
+                  {player.positions.toString()} ({player.team})
+                </td>
+              </tr>
+              <tr
+                className={
+                  player.ownership?.owner_team_key === teamKey ? 'my-team' : ''
+                }
+              >
+                <td className="desktop">{player.rank}</td>
+                <td className="desktop">{player.name}</td>
+                <td className="desktop">{player.positions.toString()}</td>
+                <td className="desktop">{player.team}</td>
+                {player.stats.map((stat) => (
+                  <td key={stat.stat_id}>
+                    {parseFloat(stat.value).toFixed(0)}
+                  </td>
+                ))}
+              </tr>
+            </React.Fragment>
           ))}
         </tbody>
       </Table>

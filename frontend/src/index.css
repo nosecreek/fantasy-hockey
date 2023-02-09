@@ -251,3 +251,30 @@ th.weight4 {
 .footer a, .login a {
   color: #f2f2f2;
 }
+
+.mobile {
+  display: none;
+}
+@media only screen and (max-width: 750px) {
+  .mobile {
+    display: table-row;
+    text-align: left;
+    border-top: 2px solid #222 !important;
+  }
+}
+@media only screen and (max-width: 900px) {
+  .player-table {
+    overflow: scroll;
+    max-width: 100vw;
+    display: block;
+  }
+}
+
+.desktop {
+  display: none;
+}
+@media only screen and (min-width: 751px) {
+  .desktop {
+    display: table-cell;
+  }
+}
