@@ -51,12 +51,16 @@ const Help = ({ setHelpScreen, helpScreen }) => {
     <div className="help">
       <div className="helpBox">
         <h2>Help</h2>
-
         <p>
           This is a tool for analyzing your weekly matchups in Yahoo!
-          head-to-head leagues. Your currently weekly matchup will be displayed,
-          similar to the example below. You can use the left/right arrows to
-          analyze upcoming and already completed matchups.
+          head-to-head fantasy hockey leagues.
+        </p>
+
+        <h2>Matchup Tab</h2>
+        <p>
+          Your currently weekly matchup will be displayed, similar to the
+          example below. You can use the left/right arrows to analyze upcoming
+          and already completed matchups.
         </p>
 
         <Table bordered hover>
@@ -126,6 +130,71 @@ const Help = ({ setHelpScreen, helpScreen }) => {
           Season total stats divided by the number of weeks played so far. Does
           not consider current rosters, and is therefore likely to be less
           accurate.
+        </p>
+
+        <h2>Players Tab</h2>
+        <p>
+          View and customize player rankings (skaters only) based on your league
+          settings and matchups!
+        </p>
+
+        <p>
+          Click on a category name to toggle how much weight it is given when
+          calculating the rankings:
+        </p>
+
+        <ul className="players-help">
+          <li>
+            <div className="example-block">
+              <div className="example-cell weight0">G</div>
+            </div>
+            <span>Not considered in player rankings</span>
+          </li>
+          <li>
+            <div className="example-block">
+              <div className="example-cell weight1">A</div>
+            </div>
+            <span>Given minimal consideration</span>
+          </li>
+          <li>
+            <div className="example-block">
+              <div className="example-cell weight2">PPP</div>
+            </div>
+            <span>Given default consideration</span>
+          </li>
+          <li>
+            <div className="example-block">
+              <div className="example-cell weight3">SOG</div>
+            </div>
+            <span>Given slightly extra consideration</span>
+          </li>
+          <li>
+            <div className="example-block">
+              <div className="example-cell weight4">HIT</div>
+            </div>
+            <span>Given heavy consideration</span>
+          </li>
+        </ul>
+
+        <p>Two additional categories will be shown:</p>
+        <ul>
+          <li>WEEK: The number of games remaining this week</li>
+          <li>
+            NEXT: The number of games this player is scheduled to play next week
+          </li>
+        </ul>
+        <p>
+          You can also click on these headings to toggle how much value these
+          schedules are given when calculating each player's ranking.
+        </p>
+        <p>
+          The <em>Current Matchup</em> and <em>Next Matchup</em> buttons at the
+          top of the page will automatically optimize the ranking for the
+          appropriate week. Categories where you and your opponent opponent have
+          similar projections will be given extra weight, and categories where
+          you are projected to easily win/lose are given less weight or no
+          weight at all. This helps to create a custom set of rankings for the
+          streamers that are most likely to help you win your matchups!
         </p>
 
         {helpScreen && (

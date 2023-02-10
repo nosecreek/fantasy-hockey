@@ -221,24 +221,56 @@ th.stat {
   cursor: pointer;
 }
 
-th.weight0 {
+th.weight0, .weight0 {
   background: rgb(100% 0% 0%);
 }
 
-th.weight1 {
+th.weight1, .weight1 {
   background: rgb(250 198 0);
 }
 
-th.weight2 {
-  background: transparent;
+th.weight2, .weight2 {
+  background: #f2f2f2;
 }
 
-th.weight3 {
+th.weight3, .weight3 {
   background: rgb(149 247 0);
 }
 
-th.weight4 {
+th.weight4, .weight4 {
   background: rgb(0 200 45);
+}
+
+ul.players-help {
+  padding-left: 0;
+}
+
+ul.players-help li {
+  list-style-type: none;
+  text-align: left;
+  position: relative;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.example-block {
+  width: 4em;
+  text-align: center;
+  display: inline-block;
+}
+
+.example-cell {
+  display: inline-block;
+  padding: .5rem;
+  color: var(--bs-body-color);
+  font-weight: 700;
+  border: 1px solid var(--bs-border-color);
+  margin: 2px 0;
+}
+
+.helpBox ul li {
+  text-align: left;
+  margin-left: 2rem;
 }
 
 .footer {
