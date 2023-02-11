@@ -29,13 +29,13 @@ const App = () => {
   const [lastMonthSchedule, setLastMonthSchedule] = useState(null)
   const [players, setPlayers] = useState(null)
 
-  const today = new Date(new Date().setDate(new Date().getDate()))
+  //EST Time
+  const tZone = new Date(new Date().getTime() - 5 * 3600000)
+  const today = tZone.toISOString().split('T')[0]
+  const yesterday = new Date(tZone.setDate(new Date().getDate() - 1))
     .toISOString()
     .split('T')[0]
-  const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
-    .toISOString()
-    .split('T')[0]
-  const lastMonth = new Date(new Date().setMonth(new Date().getMonth() - 1))
+  const lastMonth = new Date(tZone.setMonth(new Date().getMonth() - 1))
     .toISOString()
     .split('T')[0]
 
@@ -82,8 +82,15 @@ const App = () => {
           `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${matchup.matchups[currentWeek].week_start}&endDate=${matchup.matchups[currentWeek].week_end}`
         )
       ])
+
+      //exclude today's game that have already started
+      const filteredWeekSchedule = weekSchedule.data
+      filteredWeekSchedule.dates[0].games =
+        filteredWeekSchedule.dates[0].games.filter(
+          (game) => new Date(game.gameDate).getTime() >= new Date().getTime()
+        )
       setTeamStats(stats.data)
-      setWeekSchedule(weekSchedule.data)
+      setWeekSchedule(filteredWeekSchedule)
       setNextSchedule(nextSchedule.data)
     }
     if (teamKey && matchup && currentWeek && !teamStats) getTeamStats()

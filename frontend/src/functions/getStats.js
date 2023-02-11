@@ -83,7 +83,6 @@ const calculatePredicted = async (
 
   //If current week, add existing totals
   if (matchupStats) {
-    console.log(matchupStats)
     stats.forEach((cat) => {
       if (cat.id !== 28 && cat.id !== 23 && cat.id !== 22) {
         cat[team] += parseFloat(
