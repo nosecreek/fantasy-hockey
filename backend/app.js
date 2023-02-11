@@ -49,7 +49,7 @@ app.get('/auth/yahoo', (req, res) => {
   try {
     yf.auth(res)
   } catch (e) {
-    console.log(e.description)
+    console.log('Auth error:', e.description)
   }
 })
 
@@ -78,7 +78,7 @@ app.get('/auth/yahoo/callback', (req, res) => {
       return res.redirect(FRONTEND_URI)
     })
   } catch (e) {
-    console.log(e.description)
+    console.log('Callback error:', e.description)
   }
 })
 
@@ -117,17 +117,27 @@ app.get('/api/team', middleware.userExtractor, async (req, res) => {
 })
 
 app.post('/api/league', middleware.userExtractor, async (req, res) => {
-  const yf = createYF()
-  yf.setUserToken(req.userToken)
-  const data = await yf.league.settings(req.body.leagueKey)
-  res.json(data)
+  try {
+    const yf = createYF()
+    yf.setUserToken(req.userToken)
+    const data = await yf.league.settings(req.body.leagueKey)
+    res.json(data)
+  } catch (e) {
+    console.log(e.description)
+    res.status(401).send('Please login')
+  }
 })
 
 app.post('/api/matchup', middleware.userExtractor, async (req, res) => {
-  const yf = createYF()
-  yf.setUserToken(req.userToken)
-  const data = await yf.team.matchups(req.body.teamKey)
-  res.json(data)
+  try {
+    const yf = createYF()
+    yf.setUserToken(req.userToken)
+    const data = await yf.team.matchups(req.body.teamKey)
+    res.json(data)
+  } catch (e) {
+    console.log(e.description)
+    res.status(401).send('Please login')
+  }
 })
 
 app.post('/api/teamstats', middleware.userExtractor, async (req, res) => {
@@ -188,6 +198,18 @@ app.post('/api/player', middleware.userExtractor, async (req, res) => {
 })
 
 app.post('/api/players', middleware.userExtractor, async (req, res) => {
+  const yf = createYF()
+  yf.setUserToken(req.userToken)
+  try {
+    const data = await yf.players.stats(req.body.playerIds, req.body.week)
+    res.json(data)
+  } catch (e) {
+    console.log(e)
+    res.status(401).send('Please login')
+  }
+})
+
+app.post('/api/allplayers', middleware.userExtractor, async (req, res) => {
   const yf = createYF()
   yf.setUserToken(req.userToken)
   try {

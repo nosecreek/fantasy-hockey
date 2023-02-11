@@ -16,7 +16,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "yahoo-fantasy": "github:nosecreek/yahoo-fantasy-sports-api"
+    "yahoo-fantasy": "github:nosecreek/yahoo-fantasy-sports-api#players-collection-stats"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
