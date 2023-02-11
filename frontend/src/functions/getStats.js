@@ -6,9 +6,10 @@ const calculatePredicted = async (
   goalieStats,
   schedule,
   stats,
-  lastMonthSchedule
+  lastMonthSchedule,
+  matchupStats = false
 ) => {
-  for (const [i, player] of roster.entries()) {
+  roster.forEach((player) => {
     //exclude injured/NA players
     if (!player.status) {
       const gamesThisWeek = schedule.dates.filter((date) => {
@@ -44,8 +45,9 @@ const calculatePredicted = async (
         //Goalie Stats
       } else {
         const playerStartedLastMonth = parseInt(
-          goalieStats[i].data.stats.stats.find((stat) => stat.stat_id === '0')
-            .value
+          goalieStats
+            .find((g) => g.player_id === player.player_id)
+            .stats.stats.find((stat) => stat.stat_id === '0').value
         )
 
         const teamsGamesLastMonth = lastMonthSchedule.dates.filter((date) => {
@@ -70,19 +72,43 @@ const calculatePredicted = async (
             cat[team] += playerAvg * gamesThisWeek * percentPlayed
           }
         })
-
-        //Calculate GAA
-        stats.find((cat) => cat.id === 23)[team] =
-          stats.find((cat) => cat.id === 22)[team] /
-          (stats.find((cat) => cat.id === 28)[team] / 60)
-
-        //Calculate Save %
-        stats.find((cat) => cat.id === 26)[team] =
-          stats.find((cat) => cat.id === 25)[team] /
-          stats.find((cat) => cat.id === 24)[team]
       }
     }
+  })
+
+  //Calculate GAA
+  stats.find((cat) => cat.id === 23)[team] =
+    stats.find((cat) => cat.id === 22)[team] /
+    (stats.find((cat) => cat.id === 28)[team] / 60)
+
+  //If current week, add existing totals
+  if (matchupStats) {
+    console.log(matchupStats)
+    stats.forEach((cat) => {
+      if (cat.id !== 28 && cat.id !== 23 && cat.id !== 22) {
+        cat[team] += parseFloat(
+          matchupStats.find((stat) => cat.id === parseInt(stat.stat_id))
+            ?.value || '0'
+        )
+      }
+    })
+
+    //Calculate GAA according to % of week played
+    //Currently assumes a 7 day matchup, should be adjust to account for multi-week matchups
+    const dayofweek = new Date().getDay()
+    const dayoffset = (dayofweek === 0 ? 6 : dayofweek - 1) / 7
+    const knownAmount =
+      matchupStats.find((stat) => stat.stat_id === '23').value * dayoffset
+    const predictedAmount =
+      stats.find((cat) => cat.id === 23)[team] * (1 - dayoffset)
+    stats.find((cat) => cat.id === 23)[team] = knownAmount + predictedAmount
   }
+
+  //Calculate Save %
+  stats.find((cat) => cat.id === 26)[team] =
+    stats.find((cat) => cat.id === 25)[team] /
+    stats.find((cat) => cat.id === 24)[team]
+
   return stats
 }
 
@@ -181,41 +207,40 @@ const getStats = async (
   })
 
   //Load goalie stats
-  const getGoalies = async (roster) => {
+  const getGoalies = (roster) => {
     const goalies = []
-    for (const [i, player] of roster.entries()) {
+    roster.forEach((player) => {
       if (player.position_type === 'G') {
-        goalies[i] = axios.post('/api/player', {
-          playerId: player.player_key,
-          week: 'lastmonth'
-        })
+        goalies.push(player.player_key)
       }
-    }
-    return await Promise.all(goalies)
+    })
+    return goalies
   }
-  const [teamGoalieStats, oppGoalieStats] = await Promise.all([
-    getGoalies(teamRoster),
-    getGoalies(oppRoster)
-  ])
+  const goalieStats = await axios.post('/api/players', {
+    playerIds: [...getGoalies(teamRoster), ...getGoalies(oppRoster)],
+    week: 'lastmonth'
+  })
 
   //Calculate team predictions
   stats = await calculatePredicted(
     'teamPredicted',
     teamRoster,
-    teamGoalieStats,
+    goalieStats.data,
     schedule,
     stats,
-    lastMonthSchedule
+    lastMonthSchedule,
+    week === currentWeek ? matchup.matchups[week - 1].teams[0].stats : false
   )
 
   //Calculate opponent predictions
   stats = await calculatePredicted(
     'oppPredicted',
     oppRoster,
-    oppGoalieStats,
+    goalieStats.data,
     schedule,
     stats,
-    lastMonthSchedule
+    lastMonthSchedule,
+    week === currentWeek ? matchup.matchups[week - 1].teams[1].stats : false
   )
 
   return [stats, oppStats]

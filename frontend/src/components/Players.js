@@ -425,7 +425,7 @@ const Players = ({
                     : '')
                 }
               >
-                <td colspan="100%">
+                <td colSpan="100%">
                   Rank {player.rank} - <strong>{player.name}</strong> -{' '}
                   {player.positions.toString()} ({player.team})
                 </td>

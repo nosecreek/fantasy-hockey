@@ -49,7 +49,7 @@ const App = () => {
           axios.get(
             `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${lastMonth}&endDate=${yesterday}`
           ),
-          await axios.post('/api/players', {
+          await axios.post('/api/allplayers', {
             leagueKey: leagueKey
           })
         ])
