@@ -27,6 +27,10 @@ const valueToColor = (stat, other, id, number = false) => {
 
   x *= 0.915 //offset to set equal stats to yellow
 
+  //return middle yellow if team and opponent are both 0
+  if (parseFloat(stat) === 0 && parseFloat(other) === 0)
+    return range(0.5 * 0.915)
+
   return range(x)
 }
 

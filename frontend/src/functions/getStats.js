@@ -79,7 +79,7 @@ const calculatePredicted = async (
   //Calculate GAA
   stats.find((cat) => cat.id === 23)[team] =
     stats.find((cat) => cat.id === 22)[team] /
-    (stats.find((cat) => cat.id === 28)[team] / 60)
+    (stats.find((cat) => cat.id === 28)[team] || 1 / 60)
 
   //If current week, add existing totals
   if (matchupStats) {
@@ -95,7 +95,7 @@ const calculatePredicted = async (
     //Calculate GAA according to % of week played
     //Currently assumes a 7 day matchup, should be adjust to account for multi-week matchups
     const dayofweek = new Date().getDay()
-    const dayoffset = (dayofweek === 0 ? 6 : dayofweek - 1) / 7
+    const dayoffset = (dayofweek === 0 ? 7 : dayofweek) / 7
     const knownAmount =
       matchupStats.find((stat) => stat.stat_id === '23').value * dayoffset
     const predictedAmount =
