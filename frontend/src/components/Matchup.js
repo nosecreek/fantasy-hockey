@@ -17,18 +17,18 @@ const Matchup = ({
     }
   }
 
-  useEffect(() => {
-    //Allow use of left/right arrows to change week
-    const handleKeydown = (event) => {
-      if (event.keyCode === 37) changeWeek(-1)
-      else if (event.keyCode === 39) changeWeek(1)
-    }
-    window.addEventListener('keydown', handleKeydown)
+  // useEffect(() => {
+  //   //Allow use of left/right arrows to change week
+  //   const handleKeydown = (event) => {
+  //     if (event.keyCode === 37) changeWeek(-1)
+  //     else if (event.keyCode === 39) changeWeek(1)
+  //   }
+  //   window.addEventListener('keydown', handleKeydown)
 
-    return () => {
-      window.removeEventListener('keydown', handleKeydown)
-    }
-  })
+  //   return () => {
+  //     window.removeEventListener('keydown', handleKeydown)
+  //   }
+  // })
 
   if (!stats) return <div className="matchup"></div>
 
