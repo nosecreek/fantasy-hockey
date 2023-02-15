@@ -30,7 +30,7 @@ describe('Rendering the Help Screen', () => {
   })
 
   test('clicking "go back" closes the help screen', async () => {
-    render(<Help setHelpScreen={setHelpScreen} />)
+    render(<Help setHelpScreen={setHelpScreen} helpScreen={true} />)
 
     const goBack = screen.getByText('Go Back')
     userEvent.click(goBack)
