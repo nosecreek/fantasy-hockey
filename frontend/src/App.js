@@ -69,6 +69,13 @@ const App = () => {
   useEffect(() => {
     //Load team stats
     const getTeamStats = async () => {
+      let nextWeekStart = new Date(matchup.matchups[currentWeek - 1].week_end)
+      nextWeekStart.setDate(nextWeekStart.getDate() + 1)
+      nextWeekStart = nextWeekStart.toISOString().split('T')[0]
+      let nextWeekEnd = new Date(matchup.matchups[currentWeek - 1].week_end)
+      nextWeekEnd.setDate(nextWeekEnd.getDate() + 7)
+      nextWeekEnd = nextWeekEnd.toISOString().split('T')[0]
+
       const [stats, weekSchedule, nextSchedule] = await Promise.all([
         axios.post('/api/teamstats', {
           teamKey: teamKey
@@ -79,7 +86,15 @@ const App = () => {
           }`
         ),
         axios.get(
-          `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${matchup.matchups[currentWeek].week_start}&endDate=${matchup.matchups[currentWeek].week_end}`
+          `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${
+            matchup?.matchups?.[currentWeek]?.week_start
+              ? matchup?.matchups?.[currentWeek]?.week_start
+              : nextWeekStart
+          }&endDate=${
+            matchup?.matchups[currentWeek]?.week_end
+              ? matchup.matchups[currentWeek].week_end
+              : nextWeekEnd
+          }`
         )
       ])
 
