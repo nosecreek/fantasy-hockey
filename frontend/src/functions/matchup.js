@@ -37,9 +37,8 @@ const valueToColor = (stat, other, id, number = false) => {
 const getAvg = (cat, stat, currentWeek) => {
   //GAA and Save % don't need calculations
   if (cat.id === 26 || cat.id === 23) return stat
-
   const dayofweek = new Date().getDay()
-  const dayoffset = dayofweek === 6 ? 0 : (dayofweek + 1) / 7
+  const dayoffset = (dayofweek === 0 ? 7 : dayofweek + 1) / 7
   return (stat / (currentWeek - 1 + dayoffset)).toFixed(2)
 }
 
