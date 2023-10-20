@@ -9,6 +9,7 @@ import getStats from './functions/getStats'
 import Players from './components/Players'
 import Tab from 'react-bootstrap/Tab'
 import Tabs from 'react-bootstrap/Tabs'
+import playerMapping from './functions/playerMapping'
 
 const App = () => {
   const [teamKey, setTeamKey] = useState(null)
@@ -49,16 +50,18 @@ const App = () => {
           axios.get(
             `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${lastMonth}&endDate=${yesterday}`
           ),
-          await axios.post('/api/allplayers', {
-            leagueKey: leagueKey
-          })
+          axios.get(
+            'https://statsapi.web.nhl.com/api/v1/teams?hydrate=roster(person(stats(splits=statsSingleSeason)))&gameType=2'
+          )
         ])
         setLeague(league.data)
         setWeek(parseInt(league.data.current_week))
         setCurrentWeek(parseInt(league.data.current_week))
         setLastMonthSchedule(schedule.data)
-        setPlayers(players.data)
-      } catch (e) {}
+        setPlayers(playerMapping.mapNHLtoYahoo(players.data))
+      } catch (e) {
+        console.log(e)
+      }
     }
 
     if (leagueKey) {
