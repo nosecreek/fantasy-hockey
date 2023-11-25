@@ -12,6 +12,7 @@
   "author": "Dustin Lammiman",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.6.2",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",

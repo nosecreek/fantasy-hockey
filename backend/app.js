@@ -6,6 +6,7 @@ const http = require('http')
 const cors = require('cors')
 const middleware = require('./middleware')
 const bodyParser = require('body-parser')
+const axios = require('axios')
 const {
   PORT,
   FRONTEND_URI,
@@ -229,5 +230,17 @@ app.post('/api/allplayers', middleware.userExtractor, async (req, res) => {
   } catch (e) {
     console.log(e)
     res.status(401).send('Please login')
+  }
+})
+
+app.get('/api/nhlschedule/:date', async (req, res) => {
+  try {
+    const response = await axios.get(
+      `https://api-web.nhle.com/v1/schedule/${req.params.date}/`
+    )
+    res.json(response.data)
+  } catch (e) {
+    console.log(e.description)
+    res.status(401).send('Problem fetching from nhl api')
   }
 })

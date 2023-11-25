@@ -12,13 +12,11 @@ const calculatePredicted = async (
   roster.forEach((player) => {
     //exclude injured/NA players
     if (!player.status) {
-      const gamesThisWeek = schedule.dates.filter((date) => {
+      const gamesThisWeek = schedule.filter((date) => {
         return date.games.some((game) => {
           return (
-            game.teams.away.team.name.replace('é', 'e') ===
-              player.editorial_team_full_name ||
-            game.teams.home.team.name.replace('é', 'e') ===
-              player.editorial_team_full_name
+            game.awayTeam.abbrev === player.editorial_team_abbr ||
+            game.homeTeam.abbrev === player.editorial_team_abbr
           )
         })
       }).length
@@ -50,11 +48,11 @@ const calculatePredicted = async (
             .stats.stats.find((stat) => stat.stat_id === '0').value
         )
 
-        const teamsGamesLastMonth = lastMonthSchedule.dates.filter((date) => {
+        const teamsGamesLastMonth = lastMonthSchedule.filter((date) => {
           return date.games.some((game) => {
             return (
-              game.teams.away.team.name === player.editorial_team_full_name ||
-              game.teams.home.team.name === player.editorial_team_full_name
+              game.awayTeam.abbrev === player.editorial_team_abbr ||
+              game.homeTeam.abbrev === player.editorial_team_abbr
             )
           })
         }).length
@@ -152,18 +150,14 @@ const getStats = async (
 
   //Load nhl schedule
   const getSchedule = async () => {
-    if (week === currentWeek) {
-      return weekSchedule
-    } else if (week === currentWeek + 1) {
-      return nextSchedule
-    } else {
-      const result = await axios.get(
-        `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${
-          matchup.matchups[week - 1].week_start
-        }&endDate=${matchup.matchups[week - 1].week_end}`
-      )
-      return result.data
-    }
+    const result = await axios.get(
+      `/api/nhlschedule/${matchup.matchups[week - 1].week_start}`
+    )
+    return result.data.gameWeek.filter(
+      (day) =>
+        new Date(day.date).getTime() <=
+        new Date(matchup.matchups[week - 1].week_end).getTime()
+    )
   }
 
   //Resolve promises
