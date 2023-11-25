@@ -31,18 +31,51 @@ const App = () => {
   useEffect(() => {
     const loadLeagueInfo = async () => {
       try {
-        const [league, schedule] = await Promise.all([
-          axios.post('/api/league', {
-            leagueKey: leagueKey
-          }),
-          axios.get(
-            `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${lastMonth}&endDate=${yesterday}`
-          )
-        ])
+        const week2 = new Date(
+          new Date(lastMonth).setDate(new Date(lastMonth).getDate() + 7)
+        )
+          .toISOString()
+          .split('T')[0]
+        const week3 = new Date(
+          new Date(lastMonth).setDate(new Date(lastMonth).getDate() + 14)
+        )
+          .toISOString()
+          .split('T')[0]
+        const week4 = new Date(
+          new Date(lastMonth).setDate(new Date(lastMonth).getDate() + 21)
+        )
+          .toISOString()
+          .split('T')[0]
+        const week5 = new Date(
+          new Date(lastMonth).setDate(new Date(lastMonth).getDate() + 28)
+        )
+          .toISOString()
+          .split('T')[0]
+        const [league, schedule1, schedule2, schedule3, schedule4, schedule5] =
+          await Promise.all([
+            axios.post('/api/league', {
+              leagueKey: leagueKey
+            }),
+            axios.get(`/api/nhlschedule/${lastMonth}`),
+            axios.get(`/api/nhlschedule/${week2}`),
+            axios.get(`/api/nhlschedule/${week3}`),
+            axios.get(`/api/nhlschedule/${week4}`),
+            axios.get(`/api/nhlschedule/${week5}`)
+          ])
         setLeague(league.data)
         setWeek(parseInt(league.data.current_week))
         setCurrentWeek(parseInt(league.data.current_week))
-        setLastMonthSchedule(schedule.data)
+        setLastMonthSchedule([
+          ...schedule1.data.gameWeek,
+          ...schedule2.data.gameWeek,
+          ...schedule3.data.gameWeek,
+          ...schedule4.data.gameWeek,
+          ...schedule5.data.gameWeek.filter(
+            (day) =>
+              new Date(day.date).getTime() <=
+              new Date(matchup.matchups[week - 1].week_end).getTime()
+          )
+        ])
       } catch (e) {}
     }
 
@@ -128,6 +161,8 @@ const App = () => {
       />
     )
 
+  if (!teamStats || !oppStats || !week || !matchup || !currentWeek || !stats)
+    return <Loading />
   try {
     return (
       <div>
@@ -147,6 +182,7 @@ const App = () => {
       </div>
     )
   } catch (e) {
+    console.log(e)
     return <Loading />
   }
 }
