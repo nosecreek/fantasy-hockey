@@ -76,13 +76,11 @@ const Players = ({
           }
         })
 
-        const gamesThisWeek = weekSchedule.dates.filter((date) => {
+        const gamesThisWeek = weekSchedule.filter((date) => {
           return date.games.some((game) => {
             return (
-              game.teams.away.team.name.replace('é', 'e') ===
-                p.editorial_team_full_name ||
-              game.teams.home.team.name.replace('é', 'e') ===
-                p.editorial_team_full_name
+              game.awayTeam.abbrev === p.editorial_team_abbr ||
+              game.homeTeam.abbrev === p.editorial_team_abbr
             )
           })
         }).length

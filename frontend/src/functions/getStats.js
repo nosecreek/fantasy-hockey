@@ -235,7 +235,6 @@ const getStats = async (
     lastMonthSchedule,
     week === currentWeek ? matchup.matchups[week - 1].teams[1].stats : false
   )
-
   return [stats, oppStats]
 }
 

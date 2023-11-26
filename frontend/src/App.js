@@ -94,10 +94,11 @@ const App = () => {
       }
     }
 
-    if (leagueKey) {
+    if (leagueKey && matchup?.matchups) {
+      console.log('loading league info')
       loadLeagueInfo()
     }
-  }, [lastMonth, leagueKey, yesterday])
+  }, [lastMonth, leagueKey, matchup, players, week, yesterday])
 
   useEffect(() => {
     //Load team stats
@@ -113,33 +114,28 @@ const App = () => {
         axios.post('/api/teamstats', {
           teamKey: teamKey
         }),
+        axios.get(`/api/nhlschedule/${today}`),
         axios.get(
-          `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${today}&endDate=${
-            matchup.matchups[currentWeek - 1].week_end
-          }`
-        ),
-        axios.get(
-          `https://statsapi.web.nhl.com/api/v1/schedule?startDate=${
+          `/api/nhlschedule/${
             matchup?.matchups?.[currentWeek]?.week_start
               ? matchup?.matchups?.[currentWeek]?.week_start
               : nextWeekStart
-          }&endDate=${
-            matchup?.matchups[currentWeek]?.week_end
-              ? matchup.matchups[currentWeek].week_end
-              : nextWeekEnd
           }`
         )
       ])
 
-      //exclude today's game that have already started
-      const filteredWeekSchedule = weekSchedule.data
-      filteredWeekSchedule.dates[0].games =
-        filteredWeekSchedule.dates[0].games.filter(
-          (game) => new Date(game.gameDate).getTime() >= new Date().getTime()
-        )
+      //exclude today's games that have already started and games after the week ends
+      const filteredWeekSchedule = weekSchedule.data.gameWeek.filter(
+        (day) =>
+          new Date(day.date).getTime() <=
+          new Date(matchup.matchups[currentWeek - 1].week_end).getTime()
+      )
+      filteredWeekSchedule[0].games = filteredWeekSchedule[0].games.filter(
+        (game) => new Date(game.date).getTime() >= new Date().getTime()
+      )
       setTeamStats(stats.data)
       setWeekSchedule(filteredWeekSchedule)
-      setNextSchedule(nextSchedule.data)
+      setNextSchedule(nextSchedule.data.gameWeek)
     }
     if (teamKey && matchup && currentWeek && !teamStats) getTeamStats()
   }, [currentWeek, matchup, teamKey, teamStats, today])
