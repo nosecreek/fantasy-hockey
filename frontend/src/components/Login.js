@@ -55,27 +55,29 @@ const Login = ({ setTeamKey, setLeagueKey, setHelpScreen }) => {
     return (
       <div className="login">
         <div className="loginBox">
-          <h1>Fantasy Hockey Helper</h1>
           <Button variant="primary" onClick={onClickLogin} className="btn-lg">
             <TrophyFill /> Log in to Yahoo!
           </Button>
           <MdSportsHockey className="icon" />
           <p>
             A tool for analyzing your weekly matchups in Yahoo! head-to-head
-            leagues. Login with Yahoo! to continue or{' '}
+            leagues.
+            <br />
+            Login with Yahoo! to view custom player rankings and matchup
+            predictions for <em>your</em> league or{' '}
             <a href="/" onClick={(e) => displayHelp(e)}>
               click here to learn more
             </a>
             .
           </p>
-          <p>
+          {/* <p>
             Update - <em>January 16, 2023</em> - Now uses a more advanced
             algorithm to display a predicted total for each category.{' '}
             <a href="/" onClick={(e) => displayHelp(e)}>
               See 'help' to learn more
             </a>
             .
-          </p>
+          </p> */}
         </div>
       </div>
     )

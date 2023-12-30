@@ -15,8 +15,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  padding: 0 2em;
+  /* height: 100vh; */
+  padding: 2em;
 }
 
 .loginBox {
@@ -206,6 +206,10 @@ td.swatch {
   margin: 1rem;
   display: flex;
   align-items: center;
+}
+
+.pagination {
+  justify-content: center;
 }
 
 #root table.player-table td {
