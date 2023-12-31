@@ -51,8 +51,14 @@ const calculatePredicted = async (
         const teamsGamesLastMonth = lastMonthSchedule.filter((date) => {
           return date.games.some((game) => {
             return (
-              game.awayTeam.abbrev === player.editorial_team_abbr ||
-              game.homeTeam.abbrev === player.editorial_team_abbr
+              game.awayTeam.abbrev ===
+                player.editorial_team_abbr
+                  .replace('LA', 'LAK')
+                  .replace('NJ', 'NJD') ||
+              game.homeTeam.abbrev ===
+                player.editorial_team_abbr
+                  .replace('LA', 'LAK')
+                  .replace('NJ', 'NJD')
             )
           })
         }).length
@@ -77,7 +83,7 @@ const calculatePredicted = async (
   //Calculate GAA
   stats.find((cat) => cat.id === 23)[team] =
     stats.find((cat) => cat.id === 22)[team] /
-    ((stats.find((cat) => cat.id === 28)[team] || 1) / 60)
+    ((stats.find((cat) => cat.id === 28)[team] || 1) / 60 / 60)
 
   //If current week, add existing totals
   if (matchupStats) {

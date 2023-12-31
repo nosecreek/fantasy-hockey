@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Matchup from './components/Matchup'
-import Login from './components/Login'
 import Loading from './components/Loading'
 import Footer from './components/Footer'
 import Help from './components/Help'
@@ -357,17 +356,15 @@ const App = () => {
 
   if (!teamKey && players && weekSchedule && nextSchedule) {
     return (
-      <>
-        <Players
-          players={players}
-          weekSchedule={weekSchedule}
-          nextSchedule={nextSchedule}
-          setTeamKey={setTeamKey}
-          setLeagueKey={setLeagueKey}
-          setHelpScreen={setHelpScreen}
-          loggedIn={false}
-        />
-      </>
+      <Players
+        players={players}
+        weekSchedule={weekSchedule}
+        nextSchedule={nextSchedule}
+        setTeamKey={setTeamKey}
+        setLeagueKey={setLeagueKey}
+        setHelpScreen={setHelpScreen}
+        loggedIn={false}
+      />
     )
   }
 
@@ -403,6 +400,7 @@ const App = () => {
               nextSchedule={nextSchedule}
               weekStats={weekStats}
               nextStats={nextStats}
+              loggedIn={true}
             />
           </Tab>
           <Tab eventKey="help" title="Help">
